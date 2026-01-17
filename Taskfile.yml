@@ -1,0 +1,15 @@
+---
+# - Docs: https://taskfile.dev/
+# - Examples: https://dev.to/stack-labs/introduction-to-taskfile-a-makefile-alternative-h92
+version: '3'
+
+includes:
+
+vars:
+  ANSIBLE_DIR: ./ansible
+  DOMAIN:
+  PACKER_DIR: ./packer
+  TERRAFORM_DIR: ./terraform
+  WAIT_SECS_LONG: 120
+  WAIT_SECS_MEDIUM: 30
+  WAIT_SECS_SHORT: 5
