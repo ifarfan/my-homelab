@@ -3,11 +3,13 @@
 # - Examples: https://dev.to/stack-labs/introduction-to-taskfile-a-makefile-alternative-h92
 version: '3'
 
+dotenv: ['.env']
+
 includes:
 
 vars:
   ANSIBLE_DIR: ./ansible
-  DOMAIN:
+  DOMAIN: $MY_TASK_DOMAIN
   PACKER_DIR: ./packer
   TERRAFORM_DIR: ./terraform
   WAIT_SECS_LONG: 120
