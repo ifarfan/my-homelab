@@ -1,31 +1,90 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/reference/configuration-reference
+---
 version: 2.1
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/guides/orchestrate/jobs-steps/#jobs-overview & https://circleci.com/docs/reference/configuration-reference/#jobs
-jobs:
-  say-hello:
-    # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/guides/execution-managed/executor-intro/ & https://circleci.com/docs/reference/configuration-reference/#executor-job
-    docker:
-      # Specify the version you desire here
-      # See: https://circleci.com/developer/images/image/cimg/base
-      - image: cimg/base:current
+executors:
 
-    # Add steps to the job
-    # See: https://circleci.com/docs/guides/orchestrate/jobs-steps/#steps-overview & https://circleci.com/docs/reference/configuration-reference/#steps
+commands:
+
+jobs:
+  yamllint:
+    docker:
+      - image: cytopia/yamllint:latest
     steps:
-      # Checkout the code as the first step.
       - checkout
       - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
+          name: Check YAML formatting
+          command: yamllint .
+  ansiblelint:
+    docker:
+      - image: cytopia/ansible-lint:latest
+    steps:
+      - checkout
+      - run:
+          name: Run Ansible linting
+          command: cd ansible && ansible-lint
+  terraform_fmt:
+    docker:
+      - image: hashicorp/terraform:1.2.9
+    steps:
+      - checkout
+      - run:
+          name: Check terraform formatting
+          command: terraform fmt -check -recursive .
+      - run:
+          name: Upgrade findutils
+          command: apk add --no-cache findutils
+      - run:
+          name: Check for missing newline at EOF
+          # yamllint disable-line rule:line-length
+          command: (find . -type f -not -path '*/\.*' -print0 | xargs -0 -L1 sh -c 'test "$(tail -c 1 "$0")" && echo "Missing new line at end of $0"') && false || true
+  tflint:
+    docker:
+      - image: ghcr.io/terraform-linters/tflint:latest
+    steps:
+      - checkout
+      - run:
+          name: Install plugins
+          command: tflint --init
+      - run:
+          name: Lint Terraform files
+          command: tflint --chdir=.
+          environment:
+            TFLINT_LOG: "error"
+  checkov:
+    docker:
+      - image: bridgecrew/checkov:2
+    steps:
+      - checkout
+      - run:
+          name: Run checkov security scanning
+          command: checkov --framework terraform --quiet --directory .
+  trufflehog:
+    docker:
+      - image: ghcr.io/trufflesecurity/trufflehog:latest
+        user: root
+    steps:
+      - checkout
+      - run:
+          name: Scan commits in PR for credentials/tokens/secrets
+          command: trufflehog filesystem .
 
-# Orchestrate jobs using workflows
-# See: https://circleci.com/docs/guides/orchestrate/workflows/ & https://circleci.com/docs/reference/configuration-reference/#workflows
 workflows:
-  say-hello-workflow: # This is the name of the workflow, feel free to change it to better match your workflow.
-    # Inside the workflow, you define the jobs you want to run.
+  version: 2
+  my_workflow:
     jobs:
-      - say-hello
+      - yamllint
+      - ansiblelint
+      - terraform_fmt
+      - tflint
+      - checkov:
+          requires:
+            - yamllint
+            - ansiblelint
+            - terraform_fmt
+            - tflint
+      - trufflehog:
+          requires:
+            - yamllint
+            - ansiblelint
+            - terraform_fmt
+            - tflint

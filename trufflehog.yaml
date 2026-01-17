@@ -1,0 +1,7 @@
+---
+# ? See references:
+# ? - https://github.com/feeltheajf/trufflehog3/blob/2.x/trufflehog.yaml
+# ? - https://github.com/feeltheajf/trufflehog3/blob/2.x/examples/trufflehog.yaml
+skip_paths:
+
+skip_strings:
