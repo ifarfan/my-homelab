@@ -1,0 +1,12 @@
+---
+# Use "rpi-local" group once when RPis are first booted
+rpi_local:
+  hosts:
+    rpi0.local:
+    rpi1.local:
+  vars:
+    ansible_ssh_user: izzy
+# Use "rpi" group once after RPis have been provisioned
+# ? NOTE: empty list, will be dynamically populated in rpi-build-group.yml
+rpi:
+  hosts:

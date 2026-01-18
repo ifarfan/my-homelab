@@ -1,0 +1,64 @@
+---
+version: '3'
+
+vars:
+  RPI_TF_DIR: "{{.TERRAFORM_DIR}}/rpi"
+  RPI_ANSIBLE_INVENTORY: "inventories/rpi"
+  # ? Pre-provisioned RPis
+  RPI_LOCAL_ANSIBLE_PLAYBOOK: "rpi-pre-provision.yml"
+  # ? Provisioned RPis
+  RPI_ANSIBLE_PLAYBOOK: "rpi-provision.yml"
+
+tasks:
+  # ? Terraform
+  update-dns:
+    desc: "Update DNS records for RPi hosts"
+    dir: "{{.RPI_TF_DIR}}"
+    cmds:
+      - terraform init
+      - terraform fmt && terraform validate
+      - terraform apply -compact-warnings -target=cloudflare_record.cname_records -target=cloudflare_record.dns_record
+
+  # ? Ansible (pre-provisioned RPis)
+  list-rpis-local:
+    dir: "{{.ANSIBLE_DIR}}"
+    desc: List RPis local
+    cmds:
+      - ansible-playbook -i {{.RPI_ANSIBLE_INVENTORY}} {{.RPI_LOCAL_ANSIBLE_PLAYBOOK}} --list-hosts
+
+  pre-provision-rpis:
+    dir: "{{.ANSIBLE_DIR}}"
+    desc: Provision RPis
+    cmds:
+      - ansible-playbook -i {{.RPI_ANSIBLE_INVENTORY}} {{.RPI_LOCAL_ANSIBLE_PLAYBOOK}}
+
+  # ? Ansible
+  list-rpis:
+    dir: "{{.ANSIBLE_DIR}}"
+    desc: List RPis
+    cmds:
+      - ansible-playbook -i {{.RPI_ANSIBLE_INVENTORY}} {{.RPI_ANSIBLE_PLAYBOOK}} --list-hosts
+
+  provision-rpis:
+    dir: "{{.ANSIBLE_DIR}}"
+    desc: Provision RPis
+    cmds:
+      - ansible-playbook -i {{.RPI_ANSIBLE_INVENTORY}} {{.RPI_ANSIBLE_PLAYBOOK}}
+
+  update-rpis:
+    dir: "{{.ANSIBLE_DIR}}"
+    desc: Update RPis
+    cmds:
+      - ansible-playbook -i {{.RPI_ANSIBLE_INVENTORY}} {{.RPI_ANSIBLE_PLAYBOOK}}
+
+  provision-traefik:
+    desc: "Provision 'Traefik' on RPis"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook -i {{.RPI_ANSIBLE_INVENTORY}} {{.RPI_ANSIBLE_PLAYBOOK}} --tag traefik
+
+  provision-pulse:
+    desc: "Provision 'Pulse' on RPi"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook -i {{.RPI_ANSIBLE_INVENTORY}} {{.RPI_ANSIBLE_PLAYBOOK}} --tag pulse
