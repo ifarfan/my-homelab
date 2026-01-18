@@ -1,0 +1,9 @@
+---
+# Global values
+apt_cache_time: 1800
+global_domain: "{{ lookup('ansible.builtin.ini', 'domain', section='proxmox', file='credentials.ini') }}"
+global_tz: America/New_York
+dns_external_servers:
+  # Cloudflare DNS
+  - 1.1.1.1
+  - 1.0.0.1

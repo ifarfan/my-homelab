@@ -1,0 +1,13 @@
+---
+use_default_rules: true
+
+skip_list:
+  - meta-no-info
+
+warn_list:
+  - key-order[task]
+  - no-handler
+  - name[casing]
+  - yaml[line-length]
+
+# exclude_paths:
