@@ -10,4 +10,5 @@ warn_list:
   - name[casing]
   - yaml[line-length]
 
-# exclude_paths:
+exclude_paths:
+  - roles/modern_unix/molecule/tests
