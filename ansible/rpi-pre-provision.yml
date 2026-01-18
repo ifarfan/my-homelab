@@ -1,0 +1,76 @@
+---
+- name: RPis pre-provisioning (local)
+  hosts: rpi_local
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Get default authorized_keys file content
+      ansible.builtin.slurp:
+        src: /home/izzy/.ssh/authorized_keys
+      register: authorized_keys_content
+      changed_when: false
+
+    - name: Set root authorized_keys from default user
+      ansible.posix.authorized_key:
+        user: root
+        key: "{{ authorized_keys_content['content'] | b64decode }}"
+        state: present
+        exclusive: true
+
+    - name: List of remote unmanaged netplan files
+      ansible.builtin.command:
+        ls -1 /etc/netplan/
+      register: unmanaged_files
+      changed_when: false
+
+    - name: Remove remote unmanaged netplan files
+      ansible.builtin.file:
+        path: "/etc/netplan/{{ item }}"
+        state: absent
+      loop: "{{ unmanaged_files.stdout_lines }}"
+
+    - name: Run local dig command to find new IP
+      ansible.builtin.command: "dig +short {{ inventory_hostname_short }}.{{ global_domain }}"
+      delegate_to: localhost
+      become: false
+      register: dig_output
+      changed_when: false
+
+    - name: Get mac address for eth0
+      ansible.builtin.slurp:
+        src: /sys/class/net/eth0/address
+      register: mac_address_content
+      changed_when: false
+
+    - name: Set new netplan config file
+      ansible.builtin.copy:
+        dest: /etc/netplan/90-static-ip.yaml
+        mode: 0600
+        content: |
+          network:
+            version: 2
+            ethernets:
+              eth0:
+                renderer: networkd
+                match:
+                  macaddress: '{{ mac_address_content["content"] | b64decode | trim() }}'
+                addresses:
+                - "{{ dig_output.stdout }}/24"
+                nameservers:
+                  addresses:
+                  - {{ dns_external_servers[0] }}
+                  - {{ dns_external_servers[1] }}
+                routes:
+                  - to: default
+                    via: {{ ansible_default_ipv4.gateway }}
+                dhcp6: false
+                wakeonlan: true
+
+    - name: Set hostname
+      ansible.builtin.hostname:
+        name: "{{ inventory_hostname_short }}.{{ global_domain }}"
+
+    - name: Reboot RPi + may lose connection
+      ansible.builtin.reboot:
+        post_reboot_delay: 60
+        reboot_timeout: 180

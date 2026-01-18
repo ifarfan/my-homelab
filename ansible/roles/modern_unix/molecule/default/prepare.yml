@@ -1,0 +1,29 @@
+---
+- name: Prepare
+  hosts: all
+  become: true
+  tasks:
+    - name: Include global Ansible variables
+      ansible.builtin.include_vars:
+        dir: ../../../../group_vars/all
+
+    #
+    # ! NOTE:
+    # ! Include below any tasks you need to execute prior to running any tests
+    #
+    - name: Update apt caches
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: "{{ apt_cache_time }}"
+
+    - name: Install dependencies
+      ansible.builtin.apt:
+        pkg: "{{ item }}"
+        state: present
+      loop:
+        - xz-utils
+        - zip
+
+    - name: Install Goss
+      ansible.builtin.include_role:
+        name: goss

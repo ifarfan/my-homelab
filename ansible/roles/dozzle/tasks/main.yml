@@ -1,0 +1,13 @@
+---
+- name: Configure Dozzle
+  block:
+
+    - name: Configure Dozzle (Agent)
+      ansible.builtin.import_tasks: agent.yml
+      when: is_agent
+
+    - name: Configure Dozzle (Server)
+      ansible.builtin.import_tasks: server.yml
+      when: not is_agent
+
+  tags: dozzle

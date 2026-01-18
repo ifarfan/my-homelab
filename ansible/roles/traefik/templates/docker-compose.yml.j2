@@ -1,0 +1,34 @@
+---
+services:
+  traefik:
+    image: "traefik:{{ traefik_version }}"
+    container_name: "traefik"
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "80:80"
+      - "443:443"
+      # - "8080:8080"  # Don't do this in production!
+    environment:
+      - CF_API_EMAIL=$CF_API_EMAIL
+      - CF_DNS_API_TOKEN=$CF_DNS_API_TOKEN
+    volumes:
+      - ./certs:/etc/traefik/certs
+      - ./config.yml:/etc/traefik/config.yml:ro
+      - ./traefik.yml:/etc/traefik/traefik.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.entrypoints=http"
+      - "traefik.http.routers.traefik.rule=Host(`{{ traefik_uri }}`)"
+      - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.traefik-secure.entrypoints=https"
+      - "traefik.http.routers.traefik-secure.rule=Host(`{{ traefik_uri }}`)"
+      - "traefik.http.routers.traefik-secure.tls=true"
+      - "traefik.http.routers.traefik-secure.tls.certresolver=cloudflare"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].main={{ global_domain }}"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.{{ global_domain }}"
+      - "traefik.http.routers.traefik-secure.service=api@internal"

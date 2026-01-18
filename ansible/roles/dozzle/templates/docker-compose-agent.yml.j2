@@ -1,0 +1,20 @@
+---
+services:
+  dozzle-agent:
+    image: amir20/dozzle:{{ dozzle_image_version }}
+    container_name: dozzle-agent
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    command: agent
+    ports:
+      - {{ dozzle_agent_port }}:{{ dozzle_agent_port }}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    # See https://dozzle.dev/guide/agent#setting-up-healthcheck
+    healthcheck:
+      test: ["CMD", "/dozzle", "healthcheck"]
+      interval: 5s
+      retries: 5
+      start_period: 5s
+      start_interval: 5s

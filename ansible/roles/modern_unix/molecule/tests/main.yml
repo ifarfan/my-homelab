@@ -1,0 +1,38 @@
+---
+file:
+  /etc/profile.d/10-aliases.sh:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: "0644"
+  /root/.gitconfig:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: "0644"
+  /usr/local/bin/procs:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: "0755"
+
+package:
+  bat:
+    installed: true
+  bottom:
+    installed: true
+  curlie:
+    installed: true
+  du-dust:
+    installed: true
+  duf:
+    installed: true
+  jq:
+    installed: true
+  lsd-musl:
+    installed: true
+  ripgrep:
+    installed: true
