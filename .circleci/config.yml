@@ -14,14 +14,14 @@ jobs:
       - run:
           name: Check YAML formatting
           command: yamllint .
-  # ansiblelint:
-  #   docker:
-  #     - image: cytopia/ansible-lint:latest
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: Run Ansible linting
-  #         command: cd ansible && ansible-lint
+  ansiblelint:
+    docker:
+      - image: cytopia/ansible-lint:latest
+    steps:
+      - checkout
+      - run:
+          name: Run Ansible linting
+          command: cd ansible && ansible-lint
   terraform_fmt:
     docker:
       - image: hashicorp/terraform:1.2.9
@@ -73,18 +73,18 @@ workflows:
   my_workflow:
     jobs:
       - yamllint
-      # - ansiblelint
+      - ansiblelint
       - terraform_fmt
       - tflint
       - checkov:
           requires:
             - yamllint
-            # - ansiblelint
+            - ansiblelint
             - terraform_fmt
             - tflint
       - trufflehog:
           requires:
             - yamllint
-            # - ansiblelint
+            - ansiblelint
             - terraform_fmt
             - tflint

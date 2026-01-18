@@ -6,6 +6,7 @@ version: '3'
 dotenv: ['.env']
 
 includes:
+  proxmox: ./tasks/proxmox.yml
 
 vars:
   ANSIBLE_DIR: ./ansible

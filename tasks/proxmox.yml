@@ -1,0 +1,30 @@
+---
+version: '3'
+
+vars:
+  PROXMOX_INVENTORY: inventories/proxmox
+
+tasks:
+  list-nodes:
+    dir: "{{.ANSIBLE_DIR}}"
+    desc: List Proxmox nodes
+    cmds:
+      - ansible-playbook -i {{.PROXMOX_INVENTORY}} proxmox-provision.yml --list-hosts
+
+  provision-nodes:
+    dir: "{{.ANSIBLE_DIR}}"
+    desc: Provision Proxmox nodes
+    cmds:
+      - ansible-playbook -i {{.PROXMOX_INVENTORY}} proxmox-provision.yml
+
+  update-nodes:
+    dir: "{{.ANSIBLE_DIR}}"
+    desc: Update Proxmox nodes
+    cmds:
+      - ansible-playbook -i {{.PROXMOX_INVENTORY}} proxmox-update.yml
+
+  reboot-nodes:
+    dir: "{{.ANSIBLE_DIR}}"
+    desc: Reboot Proxmox nodes
+    cmds:
+      - ansible-playbook -i {{.PROXMOX_INVENTORY}} proxmox-reboot.yml

@@ -1,0 +1,27 @@
+---
+- name: Set global aliases
+  ansible.builtin.copy:
+    dest: /etc/profile.d/00-aliases.sh
+    content: |
+      {{ aliases }}
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Set global prompt
+  ansible.builtin.copy:
+    dest: /etc/profile.d/10-prompt.sh
+    content: |
+      {{ prompt }}
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Set DNS
+  ansible.builtin.copy:
+    dest: /etc/resolv.conf
+    content: |
+      {{ dns }}
+    owner: root
+    group: root
+    mode: 0644

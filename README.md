@@ -1,30 +1,23 @@
 # My-Homelab
-Documenting my `homelab` journey
+Documenting my `homelab` journey using a `Proxmox` cluster running, primarily, LXC containers and some VMs. Using `IaC`, as much as possible, for reproducibility and for general automation. Also using some Raspeberry Pis for extra fun and games.
 
+*Grosso modo*,
 - Configure + manage **Proxmox** nodes via `Ansible`
 - Create VMs + LXC containers via `Terraform`
 - Manage VMs + LXC containers via `Ansible`
+- Also manage Raspberry Pis via `Ansible`
 - Create VM templates via `Packer`
-
-### Hardware
-Currently running `1` macminis as a `Proxmox` cluster
-
-```shell
-m0:
-  Model:  Macmini8,1
-  Memory: 64GB
-  CPU:    12 logical / 6 CPUs x Intel(R) Core(TM) i7-8700B CPU @ 3.2GHz
-  Disk:   512GB SSD
-  IP:     192.168.136.10
-```
-
-### Runbooks
-1. All operations have been encapsulated into **tasks**:
+- All recurring operations encapsulated via `task`:
    ```shell
    # From repo root
    task --list
    ```
 
-### Notes
-1. Enable LetsEncrypt certificates for Proxmox nodes:
-   [https://www.smarthomebeginner.com/proxmox-ssl-certificate-with-letsencrypt/](https://www.smarthomebeginner.com/proxmox-ssl-certificate-with-letsencrypt/)
+## Docs
+1. [Hardware](docs/hardware.md) used + general [network](docs/network.md) layout
+1. [Proxmox](docs/proxmox.md) notes + configuration steps
+1. [Raspberry Pis](docs/rpi.md) setup + configuration
+1. Using [Task](docs/task.md) for encapsulating all jobs/scripts/work
+1. [Terraform](docs/terraform.md) for launching LXCs & VMs
+1. [Ansible](docs/ansible.md) for configuring LXCs & VMs and miscellaneous orchestration tasks
+1. [Packer](docs/packer.md) for creating VM templates

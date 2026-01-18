@@ -1,0 +1,4 @@
+---
+# ? NOTE: empty list, will be dynamically populated in proxmox-build-group.yml
+my_proxmox_nodes:
+  hosts:
