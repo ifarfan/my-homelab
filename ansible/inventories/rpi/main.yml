@@ -7,6 +7,6 @@ rpi_local:
   vars:
     ansible_ssh_user: izzy
 # Use "rpi" group once after RPis have been provisioned
-# ? NOTE: empty list, will be dynamically populated in rpi-build-group.yml
+# ? NOTE: empty list, will be dynamically populated in rpi-provision.yml
 rpi:
   hosts:

@@ -1,0 +1,75 @@
+---
+- name: Build RPis list with FQDN
+  hosts: all
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Set FQDN for RPis
+      ansible.builtin.add_host:
+        hostname: "{{ item | split('.') | first }}.{{ global_domain }}"
+        groups: rpi
+      loop: "{{ groups.rpi_local }}"
+
+    - name: List FQDN nodes
+      ansible.builtin.debug:
+        msg: "{{ groups.rpi }}"
+
+# ? Shared RPi provisioning playbook
+- name: RPis provisioning
+  hosts: rpi
+  become: true
+  gather_facts: true
+  tasks:
+    # ? Base OS install + fixings
+    - name: Install Ubuntu base
+      ansible.builtin.include_role:
+        name: base_24
+      vars:
+        is_hardware: true
+        has_swap: true
+
+    - name: Install modern Unix utilities
+      ansible.builtin.include_role:
+        name: modern_unix
+
+    # ? Docker daemon + docker compose apps
+    - name: Install Docker
+      ansible.builtin.include_role:
+        name: docker
+
+    - name: Install docker_proxy
+      ansible.builtin.include_role:
+        name: docker_proxy
+
+    - name: Install dozzle
+      ansible.builtin.include_role:
+        name: dozzle
+      vars:
+        is_agent: true
+
+    # ? Docker apps
+    - name: Install Traefik
+      ansible.builtin.include_role:
+        name: traefik
+      vars:
+        hostname_in_uri: true
+      tags: traefik
+
+# ? Individual RPi provisioning: rpi0
+- name: RPi0 individual provisioning
+  hosts: rpi[0]
+  become: true
+  gather_facts: true
+  tasks:
+
+# ? Individual RPi provisioning: rpi1
+- name: RPi1 individual provisioning
+  hosts: rpi[1]
+  become: true
+  gather_facts: true
+  tasks:
+    # ? Docker apps
+    - name: Install Pulse
+      ansible.builtin.include_role:
+        name: pulse
+      tags: pulse
