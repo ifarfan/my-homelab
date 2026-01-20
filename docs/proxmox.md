@@ -57,4 +57,12 @@ Using Proxmox `9.1.x` on **x86-based** macminis
   task proxmox:provision-nodes
   ```
 
-7. Create **cluster** from web GUI
+7. Download CT/LXC templates via GUI:
+   `Node` > `local (XYZ)` > `CT Templates` > `Templates`
+   Look for:
+   - `ubuntu-24-04-standard` (Noble)
+
+8. Create **cluster** from web GUI:
+   `Datacenter` > `Cluster` > `Create Cluster`
+   Choose "192.168.136.100" network
+   Use `Join Information` to get the token needed by other nodes to join

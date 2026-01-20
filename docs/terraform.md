@@ -13,11 +13,10 @@ tfenv list
 ## Usage
 For virtually all **Terraform** plans, from `terraform` root folder:
 
-1. Create `template` folder + symlink appropriate secret values files
+1. Create `template` folder + symlink appropriate "secrets" file
    ```shell
    mkdir new-template && cd new-template
-   ln -s ../proxmox.auto.tfvars    proxmox.auto.tfvars
-   ln -s ../cloudflare.auto.tfvars cloudflare.auto.tfvars
+   ln -s ../secrets.auto.tfvars secrets.auto.tfvars
    ```
 1. Proceed with `Terrafom` as usual
    ```shell
@@ -28,8 +27,8 @@ For virtually all **Terraform** plans, from `terraform` root folder:
    ```
 
 ## Notes
-- Password variables are stored under `terraform.tfvars` and are invoked automatically
-- Use `terraform.tfvars.sample` as a reference file
+- Password variables are stored under `secrets.auto.tfvars` and are invoked automatically
+- Use `secrets.auto.tfvars.sample` as a reference file
 - **NOTE**: ensure they are never checked into **git** :warning:
 
 

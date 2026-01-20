@@ -1,9 +1,0 @@
-#
-# 1. Fill in appropriate values below
-# 2. Rename file to cloudflare.auto.tfvars
-# 3. Symlink to it from individual terraform template folder
-#
-
-# Cloudflare
-cloudflare_api_token = "XXXXXXXXXX"
-cloudflare_domain = "XXXXXXXXXX"

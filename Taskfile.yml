@@ -6,12 +6,14 @@ version: '3'
 dotenv: ['.env']
 
 includes:
+  net: ./tasks/net.yml
   proxmox: ./tasks/proxmox.yml
   rpi: ./tasks/rpi.yml
 
 vars:
   ANSIBLE_DIR: ./ansible
-  DOMAIN: $MY_TASK_DOMAIN
+  ANSIBLE_INVENTORY_PROXMOX: inventories/proxmox
+  GLOBAL_DOMAIN: $MY_GLOBAL_DOMAIN
   PACKER_DIR: ./packer
   TERRAFORM_DIR: ./terraform
   WAIT_SECS_LONG: 120
