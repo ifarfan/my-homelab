@@ -1,0 +1,65 @@
+---
+version: '3'
+
+vars:
+  NET_HOST: "net.{{.GLOBAL_DOMAIN}}"
+  NET_TF_DIR: "{{.TERRAFORM_DIR}}/net"
+  NET_ANSIBLE_PLAYBOOK: "net-provision.yml"
+
+tasks:
+  check:
+    desc: "Check '{{.NET_HOST}}' host vars"
+    dir: "{{.NET_TF_DIR}}"
+    cmds:
+      - "echo NET_HOST={{.NET_HOST}}"
+      - "echo NET_TF_DIR={{.NET_TF_DIR}}"
+      - "echo NET_ANSIBLE_PLAYBOOK={{.NET_ANSIBLE_PLAYBOOK}}"
+
+  # ? Terraform
+  create:
+    desc: "Create '{{.NET_HOST}}' host"
+    dir: "{{.NET_TF_DIR}}"
+    cmds:
+      - terraform init
+      - terraform fmt && terraform validate
+      - terraform apply
+      - terraform output
+
+  destroy:
+    desc: "Destroy '{{.NET_HOST}}' host"
+    dir: "{{.NET_TF_DIR}}"
+    cmds:
+      - terraform destroy -compact-warnings
+
+  update-dns:
+    desc: "Update DNS records for '{{.NET_HOST}}' host"
+    dir: "{{.NET_TF_DIR}}"
+    cmds:
+      - terraform init
+      - terraform fmt && terraform validate
+      - terraform apply -compact-warnings -target=module.my_lxc.cloudflare_record.cname_records
+
+  # ? Ansible
+  provision:
+    desc: "Provision '{{.NET_HOST}}' via Ansible"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.NET_ANSIBLE_PLAYBOOK}}"
+
+  provision-tailscale:
+    desc: "Provision 'Tailscale' on '{{.NET_HOST}}'"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.NET_ANSIBLE_PLAYBOOK}} --tag tailscale"
+
+  provision-rustdesk:
+    desc: "Provision 'RustDesk' on '{{.NET_HOST}}'"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.NET_ANSIBLE_PLAYBOOK}} --tag rustdesk"
+
+  provision-cloudflare-ddns:
+    desc: "Provision 'Cloudflare DDNS' on '{{.NET_HOST}}'"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.NET_ANSIBLE_PLAYBOOK}} --tag cloudflare_ddns"

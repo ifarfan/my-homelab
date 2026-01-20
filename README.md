@@ -1,5 +1,5 @@
 # My-Homelab
-Documenting my `homelab` journey using a `Proxmox` cluster running, primarily, LXC containers and some VMs. Using `IaC`, as much as possible, for reproducibility and for general automation. Also using some Raspeberry Pis for extra fun and games.
+Documenting my `homelab` journey using a `Proxmox` cluster running, primarily, LXC containers and some VMs. Using `IaC`, as much as possible, for reproducibility and for general automation. Also using some Raspberry Pis for some extra fun and games.
 
 *Grosso modo*,
 - Configure + manage **Proxmox** nodes via `Ansible`

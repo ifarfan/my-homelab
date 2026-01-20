@@ -8,7 +8,8 @@ m0:
   Memory: 64GB
   CPU:    12 logical / 6 CPUs x Intel(R) Core(TM) i7-8700B CPU @ 3.2GHz
   Disk:   512GB SSD
-  IP:     192.168.136.10
+  IP-1:   192.168.136.10  (vmbr0: native ethernet / used for VMs + LXCs)
+  IP-2:   192.168.136.100 (vmbr1: thunderbold ethernet / used for ceph-ONLY)
 ```
 
 And, `2` **Raspberry Pis** for internal DNS and miscellaneous tasks:
