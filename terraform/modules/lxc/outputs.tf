@@ -8,7 +8,7 @@ output "lxc_vmid" {
   value       = proxmox_lxc.lxc.vmid
 }
 
-output "lxc_node" {
+output "lxc_proxmox_node" {
   description = "LXC Proxmox Node"
   value       = "${proxmox_lxc.lxc.target_node}.${var.cloudflare_domain}"
 }

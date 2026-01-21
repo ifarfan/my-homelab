@@ -16,7 +16,8 @@ tasks:
       - "echo NET_ANSIBLE_PLAYBOOK={{.NET_ANSIBLE_PLAYBOOK}}"
 
   # ? Terraform
-  create:
+  terraform-run:
+    internal: true
     desc: "Create '{{.NET_HOST}}' host"
     dir: "{{.NET_TF_DIR}}"
     cmds:
@@ -25,7 +26,25 @@ tasks:
       - terraform apply
       - terraform output
 
-  destroy:
+  create-lxc:
+    desc: "Create '{{.NET_HOST}}' host + patch LXC"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - task: terraform-run
+      - |
+        ansible-playbook \
+          -i {{.ANSIBLE_INVENTORY_PROXMOX}} \
+          proxmox-lxc-patch.yml \
+          --extra-vars 'lxc_hostname={{.LXC_HOSTNAME}} lxc_id={{.LXC_ID}} lxc_proxmox_node={{.LXC_PROXMOX_NODE}} lxc_patch=network'
+    vars:
+      LXC_HOSTNAME:
+        sh: terraform -chdir={{.NET_TF_DIR}} output -json my_lxc | jq -r '.lxc_hostname'
+      LXC_ID:
+        sh: terraform -chdir={{.NET_TF_DIR}} output -json my_lxc | jq -r '.lxc_vmid'
+      LXC_PROXMOX_NODE:
+        sh: terraform -chdir={{.NET_TF_DIR}} output -json my_lxc | jq -r '.lxc_proxmox_node'
+
+  destroy-lxc:
     desc: "Destroy '{{.NET_HOST}}' host"
     dir: "{{.NET_TF_DIR}}"
     cmds:

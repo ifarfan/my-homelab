@@ -1,0 +1,95 @@
+---
+# Get terraform outputs:
+# - lxc_hostname: LXC hostname
+# - lxc_id: LXC vm ID
+# - lxc_proxmox_node: Proxmox node where LXC is hosted
+# - lxc_patch: types are "network"
+- name: Patch LXC directly on Proxmox node
+  hosts: "{{ lxc_proxmox_node | split('.') | first }}"
+  become: true
+  gather_facts: true
+  tasks:
+    #
+    # ? Reboot, if LXC just created or modified
+    #
+    - name: Determine if LXC needs reboot
+      ansible.builtin.find:
+        paths: /etc/pve/lxc/
+        patterns: "{{ lxc_id }}.conf"
+        file_type: file
+        contains: '\[pve:pending\]'
+        read_whole_file: true
+      register: pending_reboot
+
+    - name: Reboot, if pending changes
+      block:
+        - name: Report if reboot is needed
+          ansible.builtin.debug:
+            msg: "Rebooting {{ lxc_hostname }} (ID: {{ lxc_id }}) is required, due to pending changes"
+
+        - name: Reboot LXC container
+          ansible.builtin.command: /usr/sbin/pct reboot {{ lxc_id }}
+          register: reboot_cmd
+          changed_when: false
+
+        - name: Report reboot output
+          ansible.builtin.debug:
+            msg: "{{ reboot_cmd }}"
+          changed_when: false
+
+        - name: Wait for LXC to be ready
+          ansible.builtin.wait_for:
+            host: "{{ lxc_hostname }}"
+            port: 22
+            delay: 10
+            timeout: 60
+      when: pending_reboot.matched > 0
+
+    #
+    # ? Patch LXC: "Network"
+    # This patch allows TUN/TAP device usage inside the LXC container
+    # NOT: don't use dynamic text on blockinfile, it triggers a reboot loop
+    #
+    - name: Patch LXC with "network" config
+      block:
+        - name: Determine if patch has been applied
+          ansible.builtin.find:
+            paths: /etc/pve/lxc/
+            patterns: "{{ lxc_id }}.conf"
+            file_type: file
+            contains: 'lxc.mount.entry: /dev/net/tun'
+            read_whole_file: true
+          register: pending_patch_reboot
+
+        - name: Apply patch and reboot
+          block:
+            - name: Append patch to LXC config
+              ansible.builtin.blockinfile:
+                path: /etc/pve/lxc/{{ lxc_id }}.conf
+                append_newline: true
+                prepend_newline: true
+                state: present
+                block: |
+                  # network patch on {{ ansible_date_time.iso8601 }}
+                  lxc.cgroup2.devices.allow: c 10:200 rwm
+                  lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file
+                insertafter: EOF
+
+            - name: Reboot LXC container
+              ansible.builtin.command: /usr/sbin/pct reboot {{ lxc_id }}
+              register: reboot_cmd
+              changed_when: false
+
+            - name: Report reboot output
+              ansible.builtin.debug:
+                msg: "{{ reboot_cmd }}"
+              changed_when: false
+
+            - name: Wait for LXC to be ready
+              ansible.builtin.wait_for:
+                host: "{{ lxc_hostname }}"
+                port: 22
+                delay: 10
+                timeout: 60
+          when: pending_patch_reboot.matched == 0
+      when: lxc_patch == 'network'
