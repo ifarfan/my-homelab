@@ -1,0 +1,13 @@
+---
+services:
+  cloudflare-ddns:
+    image: "oznu/cloudflare-ddns:latest"
+    container_name: "cloudflare-ddns"
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      API_KEY: $API_KEY
+      PROXIED: "false"
+      SUBDOMAIN: $SUBDOMAIN
+      ZONE: $ZONE
