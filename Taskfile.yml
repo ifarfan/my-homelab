@@ -7,6 +7,7 @@ dotenv: ['.env']
 
 includes:
   debug: ./tasks/debug.yml
+  devbox: ./tasks/devbox.yml
   net: ./tasks/net.yml
   proxmox: ./tasks/proxmox.yml
   rpi: ./tasks/rpi.yml
