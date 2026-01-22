@@ -1,11 +1,24 @@
 ---
+- name: Set dynamic hostname
+  hosts: localhost
+  gather_facts: false
+  vars:
+    my_host: net
+  tasks:
+    - name: Set hostname dynamically
+      ansible.builtin.set_fact:
+        my_fqdn_host: "{{ my_host }}.{{ global_domain }}"
+        cacheable: true
+      tags:
+        - always
+
 - name: Net provisioning
-  hosts: net
+  hosts: "{{ hostvars['localhost']['my_fqdn_host'] }}"
   become: true
   gather_facts: true
   tasks:
     # ? Base OS install + fixings
-    - name: Install Ubuntu LXC base
+    - name: Install Ubuntu base
       ansible.builtin.include_role:
         name: base_24
       vars:

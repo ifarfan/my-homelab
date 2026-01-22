@@ -1,0 +1,16 @@
+---
+- name: Configure Tailscale
+  block:
+
+    - name: Configure SysCtl
+      ansible.builtin.import_tasks: sysctl.yml
+
+    - name: Configure Tailscale (Docker)
+      ansible.builtin.import_tasks: tailscale-docker.yml
+      when: is_dockerized
+
+    - name: Configure Tailscale (Stand-alone)
+      ansible.builtin.import_tasks: tailscale-standalone.yml
+      when: not is_dockerized
+
+  tags: tailscale

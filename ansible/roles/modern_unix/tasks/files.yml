@@ -30,9 +30,21 @@
     line: "{{ item }}"
   with_items: "{{ shell_integrations }}"
 
-- name: Replace atuin sync server address
-  ansible.builtin.replace:
-    path: ~/.config/atuin/config.toml
-    regexp: '^#\s*sync_address\s*=.*'
-    replace: 'sync_address = "https://atuin.{{ global_domain }}"'
-  ignore_errors: true     # noqa ignore-errors
+- name: Create "atuin" app sub-directories
+  ansible.builtin.file:
+    path: "/root/{{ item }}"
+    state: directory
+    mode: 0700
+    owner: root
+    group: root
+  loop:
+    - .config
+    - .config/atuin
+
+- name: Copy "atuin" config file
+  ansible.builtin.template:
+    src: config.toml.j2
+    dest: /root/.config/atuin/config.toml
+    owner: root
+    group: root
+    mode: 0600
