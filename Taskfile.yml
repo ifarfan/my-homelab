@@ -6,6 +6,7 @@ version: '3'
 dotenv: ['.env']
 
 includes:
+  debug: ./tasks/debug.yml
   net: ./tasks/net.yml
   proxmox: ./tasks/proxmox.yml
   rpi: ./tasks/rpi.yml

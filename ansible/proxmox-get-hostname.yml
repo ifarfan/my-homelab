@@ -1,0 +1,23 @@
+---
+- name: Set dynamic hostname
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Dynamic host name setup
+      block:
+        - name: Check if my_host is defined, fail if not
+          ansible.builtin.debug:
+            msg: "'my_host' is not defined"
+          when: my_host is not defined
+          failed_when: my_host is not defined
+
+        - name: Set hostname dynamically
+          ansible.builtin.set_fact:
+            my_fqdn_host: "{{ my_host }}.{{ global_domain }}"
+            cacheable: true
+
+        - name: Show hostname
+          ansible.builtin.debug:
+            msg: "{{ my_fqdn_host }}"
+      tags:
+        - always

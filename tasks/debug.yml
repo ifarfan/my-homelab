@@ -1,0 +1,47 @@
+---
+version: '3'
+
+vars:
+  DEBUG_HOST: "debug.{{.GLOBAL_DOMAIN}}"
+  DEBUG_TF_DIR: "{{.TERRAFORM_DIR}}/debug"
+  DEBUG_ANSIBLE_PLAYBOOK: "debug-provision.yml"
+
+tasks:
+  check:
+    desc: "Check '{{.DEBUG_HOST}}' host vars"
+    dir: "{{.DEBUG_TF_DIR}}"
+    cmds:
+      - "echo DEBUG_HOST={{.DEBUG_HOST}}"
+      - "echo DEBUG_TF_DIR={{.DEBUG_TF_DIR}}"
+      - "echo DEBUG_ANSIBLE_PLAYBOOK={{.DEBUG_ANSIBLE_PLAYBOOK}}"
+
+  # ? Terraform
+  create-lxc:
+    desc: "Create '{{.DEBUG_HOST}}' host"
+    dir: "{{.DEBUG_TF_DIR}}"
+    cmds:
+      - terraform init
+      - terraform fmt && terraform validate
+      - terraform apply
+      - terraform output
+
+  destroy-lxc:
+    desc: "Destroy '{{.DEBUG_HOST}}' host"
+    dir: "{{.DEBUG_TF_DIR}}"
+    cmds:
+      - terraform destroy -compact-warnings
+
+  update-dns:
+    desc: "Update DNS records for '{{.DEBUG_HOST}}' host"
+    dir: "{{.DEBUG_TF_DIR}}"
+    cmds:
+      - terraform init
+      - terraform fmt && terraform validate
+      - terraform apply -compact-warnings -target=module.my_lxc.cloudflare_record.cname_records
+
+  # ? Ansible
+  provision:
+    desc: "Provision '{{.DEBUG_HOST}}' via Ansible"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.DEBUG_ANSIBLE_PLAYBOOK}}"
