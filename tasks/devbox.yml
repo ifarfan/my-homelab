@@ -1,0 +1,47 @@
+---
+version: '3'
+
+vars:
+  DEVBOX_HOST: "devbox.{{.GLOBAL_DOMAIN}}"
+  DEVBOX_TF_DIR: "{{.TERRAFORM_DIR}}/devbox"
+  DEVBOX_ANSIBLE_PLAYBOOK: "devbox-provision.yml"
+
+tasks:
+  check:
+    desc: "Check '{{.DEVBOX_HOST}}' host vars"
+    dir: "{{.DEVBOX_TF_DIR}}"
+    cmds:
+      - "echo DEVBOX_HOST={{.DEVBOX_HOST}}"
+      - "echo DEVBOX_TF_DIR={{.DEVBOX_TF_DIR}}"
+      - "echo DEVBOX_ANSIBLE_PLAYBOOK={{.DEVBOX_ANSIBLE_PLAYBOOK}}"
+
+  # ? Terraform
+  create-lxc:
+    desc: "Create '{{.DEVBOX_HOST}}' host"
+    dir: "{{.DEVBOX_TF_DIR}}"
+    cmds:
+      - terraform init
+      - terraform fmt && terraform validate
+      - terraform apply
+      - terraform output
+
+  destroy-lxc:
+    desc: "Destroy '{{.DEVBOX_HOST}}' host"
+    dir: "{{.DEVBOX_TF_DIR}}"
+    cmds:
+      - terraform destroy -compact-warnings
+
+  update-dns:
+    desc: "Update DNS records for '{{.DEVBOX_HOST}}' host"
+    dir: "{{.DEVBOX_TF_DIR}}"
+    cmds:
+      - terraform init
+      - terraform fmt && terraform validate
+      - terraform apply -compact-warnings -target=module.my_lxc.cloudflare_record.cname_records
+
+  # ? Ansible
+  provision:
+    desc: "Provision '{{.DEVBOX_HOST}}' via Ansible"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.DEVBOX_ANSIBLE_PLAYBOOK}}"
