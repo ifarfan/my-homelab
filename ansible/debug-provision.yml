@@ -2,9 +2,9 @@
 - name: Set dynamic hostname
   ansible.builtin.import_playbook: proxmox-get-hostname.yml
   vars:
-    my_host: net
+    my_host: debug
 
-- name: Net provisioning
+- name: Debug provisioning
   hosts: "{{ hostvars['localhost']['my_fqdn_host'] }}"
   become: true
   gather_facts: true
@@ -34,22 +34,3 @@
         name: dozzle
       vars:
         is_agent: true
-
-    # ? Docker apps
-    - name: Install Tailscale
-      ansible.builtin.include_role:
-        name: tailscale
-      vars:
-        is_subnet_router: true
-        is_dockerized: true
-      tags: tailscale
-
-    - name: Install RustDesk
-      ansible.builtin.include_role:
-        name: rustdesk
-      tags: rustdesk
-
-    - name: Install Cloudflare DDNS
-      ansible.builtin.include_role:
-        name: cloudflare_ddns
-      tags: cloudflare_ddns
