@@ -11,7 +11,7 @@ resource "cloudflare_record" "cname_records" {
 
   zone_id = lookup(data.cloudflare_zones.domain_zone.zones[0], "id")
   name    = each.value
-  content = "${each.value}.${var.cloudflare_domain}"
+  content = "${var.hostname}.${var.cloudflare_domain}"
   type    = "CNAME"
   ttl     = 1 # auto
 }

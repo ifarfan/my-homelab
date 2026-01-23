@@ -26,5 +26,6 @@ locals {
 
   # Additional DNS aliases/CNAMEs
   dns_aliases = [
+    "rustdesk"
   ]
 }
