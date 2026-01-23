@@ -1,0 +1,53 @@
+---
+version: '3'
+
+vars:
+  TOOLS_HOST: "tools.{{.GLOBAL_DOMAIN}}"
+  TOOLS_TF_DIR: "{{.TERRAFORM_DIR}}/tools"
+  TOOLS_ANSIBLE_PLAYBOOK: "tools-provision.yml"
+
+tasks:
+  check:
+    desc: "Check '{{.TOOLS_HOST}}' host vars"
+    dir: "{{.TOOLS_TF_DIR}}"
+    cmds:
+      - "echo TOOLS_HOST={{.TOOLS_HOST}}"
+      - "echo TOOLS_TF_DIR={{.TOOLS_TF_DIR}}"
+      - "echo TOOLS_ANSIBLE_PLAYBOOK={{.TOOLS_ANSIBLE_PLAYBOOK}}"
+
+  # ? Terraform
+  create-lxc:
+    desc: "Create '{{.TOOLS_HOST}}' host"
+    dir: "{{.TOOLS_TF_DIR}}"
+    cmds:
+      - terraform init
+      - terraform fmt && terraform validate
+      - terraform apply
+      - terraform output
+
+  destroy-lxc:
+    desc: "Destroy '{{.TOOLS_HOST}}' host"
+    dir: "{{.TOOLS_TF_DIR}}"
+    cmds:
+      - terraform destroy -compact-warnings
+
+  update-dns:
+    desc: "Update DNS records for '{{.TOOLS_HOST}}' host"
+    dir: "{{.TOOLS_TF_DIR}}"
+    cmds:
+      - terraform init
+      - terraform fmt && terraform validate
+      - terraform apply -compact-warnings -target=module.my_lxc.cloudflare_record.cname_records
+
+  # ? Ansible
+  provision:
+    desc: "Provision '{{.TOOLS_HOST}}' via Ansible"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.TOOLS_ANSIBLE_PLAYBOOK}}"
+
+  provision-traefik:
+    desc: "Provision 'Traefik' on '{{.TOOLS_HOST}}'"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.TOOLS_ANSIBLE_PLAYBOOK}} --tag traefik"

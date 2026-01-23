@@ -12,6 +12,7 @@ includes:
   net: ./tasks/net.yml
   proxmox: ./tasks/proxmox.yml
   rpi: ./tasks/rpi.yml
+  tools: ./tasks/tools.yml
 
 vars:
   ANSIBLE_DIR: ./ansible
