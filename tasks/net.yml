@@ -26,16 +26,16 @@ tasks:
       - terraform apply
       - terraform output
 
-  create-lxc:
-    desc: "Create '{{.NET_HOST}}' host + patch LXC"
+  ansible-post-run:
+    internal: true
+    desc: "Patch '{{.NET_HOST}}' host"
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
-      - task: terraform-run
       - |
         ansible-playbook \
           -i {{.ANSIBLE_INVENTORY_PROXMOX}} \
           proxmox-lxc-patch.yml \
-          --extra-vars 'lxc_hostname={{.LXC_HOSTNAME}} lxc_id={{.LXC_ID}} lxc_proxmox_node={{.LXC_PROXMOX_NODE}} lxc_patch=network'
+          --extra-vars 'lxc_hostname={{.LXC_HOSTNAME}} lxc_id={{.LXC_ID}} lxc_proxmox_node={{.LXC_PROXMOX_NODE}} lxc_patch=devtun'
     vars:
       LXC_HOSTNAME:
         sh: terraform -chdir={{.NET_TF_DIR}} output -json my_lxc | jq -r '.lxc_hostname'
@@ -43,6 +43,12 @@ tasks:
         sh: terraform -chdir={{.NET_TF_DIR}} output -json my_lxc | jq -r '.lxc_vmid'
       LXC_PROXMOX_NODE:
         sh: terraform -chdir={{.NET_TF_DIR}} output -json my_lxc | jq -r '.lxc_proxmox_node'
+
+  create-lxc:
+    desc: "Create '{{.NET_HOST}}' host + patch LXC"
+    cmds:
+      - task: terraform-run
+      - task: ansible-post-run
 
   destroy-lxc:
     desc: "Destroy '{{.NET_HOST}}' host"

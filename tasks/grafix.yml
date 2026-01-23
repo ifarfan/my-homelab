@@ -1,0 +1,72 @@
+---
+version: '3'
+
+vars:
+  GRAFIX_HOST: "grafix.{{.GLOBAL_DOMAIN}}"
+  GRAFIX_TF_DIR: "{{.TERRAFORM_DIR}}/grafix"
+  GRAFIX_ANSIBLE_PLAYBOOK: "grafix-provision.yml"
+
+tasks:
+  check:
+    desc: "Check '{{.GRAFIX_HOST}}' host vars"
+    dir: "{{.GRAFIX_TF_DIR}}"
+    cmds:
+      - "echo GRAFIX_HOST={{.GRAFIX_HOST}}"
+      - "echo GRAFIX_TF_DIR={{.GRAFIX_TF_DIR}}"
+      - "echo GRAFIX_ANSIBLE_PLAYBOOK={{.GRAFIX_ANSIBLE_PLAYBOOK}}"
+
+  # ? Terraform
+  terraform-run:
+    internal: true
+    desc: "Create '{{.GRAFIX_HOST}}' host"
+    dir: "{{.GRAFIX_TF_DIR}}"
+    cmds:
+      - terraform init
+      - terraform fmt && terraform validate
+      - terraform apply
+      - terraform output
+
+  ansible-post-run:
+    internal: true
+    desc: "Patch '{{.GRAFIX_HOST}}' host"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - |
+        ansible-playbook \
+          -i {{.ANSIBLE_INVENTORY_PROXMOX}} \
+          proxmox-lxc-patch.yml \
+          --extra-vars 'lxc_hostname={{.LXC_HOSTNAME}} lxc_id={{.LXC_ID}} lxc_proxmox_node={{.LXC_PROXMOX_NODE}} lxc_patch=gpu'
+    vars:
+      LXC_HOSTNAME:
+        sh: terraform -chdir={{.GRAFIX_TF_DIR}} output -json my_lxc | jq -r '.lxc_hostname'
+      LXC_ID:
+        sh: terraform -chdir={{.GRAFIX_TF_DIR}} output -json my_lxc | jq -r '.lxc_vmid'
+      LXC_PROXMOX_NODE:
+        sh: terraform -chdir={{.GRAFIX_TF_DIR}} output -json my_lxc | jq -r '.lxc_proxmox_node'
+
+  create-lxc:
+    desc: "Create '{{.GRAFIX_HOST}}' host + patch LXC"
+    cmds:
+      - task: terraform-run
+      - task: ansible-post-run
+
+  destroy-lxc:
+    desc: "Destroy '{{.GRAFIX_HOST}}' host"
+    dir: "{{.GRAFIX_TF_DIR}}"
+    cmds:
+      - terraform destroy -compact-warnings
+
+  update-dns:
+    desc: "Update DNS records for '{{.GRAFIX_HOST}}' host"
+    dir: "{{.GRAFIX_TF_DIR}}"
+    cmds:
+      - terraform init
+      - terraform fmt && terraform validate
+      - terraform apply -compact-warnings -target=module.my_lxc.cloudflare_record.cname_records
+
+  # ? Ansible
+  provision:
+    desc: "Provision '{{.GRAFIX_HOST}}' via Ansible"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.GRAFIX_ANSIBLE_PLAYBOOK}}"
