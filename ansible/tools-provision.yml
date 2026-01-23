@@ -2,9 +2,9 @@
 - name: Set dynamic hostname
   ansible.builtin.import_playbook: proxmox-get-hostname.yml
   vars:
-    my_host: grafix
+    my_host: tools
 
-- name: Grafix provisioning
+- name: Tools provisioning
   hosts: "{{ hostvars['localhost']['my_fqdn_host'] }}"
   become: true
   gather_facts: true
@@ -42,8 +42,3 @@
       vars:
         hostname_in_uri: true
       tags: traefik
-
-    - name: Install Neko
-      ansible.builtin.include_role:
-        name: neko
-      tags: neko

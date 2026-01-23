@@ -1,12 +1,12 @@
 locals {
-  hostname     = "grafix"
-  description  = "Grafix LXC"
+  hostname     = "tools"
+  description  = "Tools LXC"
   cores        = 4
   memory       = 8192
   onboot       = true
   unprivileged = false # privileged = true
-  tags         = "apps"
-  ip           = "192.168.136.33"
+  tags         = "tools"
+  ip           = "192.168.136.34"
 
   # Disks
   rootfs_size = "20G"
@@ -27,6 +27,5 @@ locals {
   # Additional DNS aliases/CNAMEs
   dns_aliases = [
     "traefik-${local.hostname}",
-    "neko",
   ]
 }
