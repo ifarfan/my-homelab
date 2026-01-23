@@ -42,3 +42,33 @@
       vars:
         hostname_in_uri: true
       tags: traefik
+
+    - name: Install Atuin
+      ansible.builtin.include_role:
+        name: atuin
+      tags: atuin
+
+    - name: Install DumbPad
+      ansible.builtin.include_role:
+        name: dumbpad
+      tags: dumbpad
+
+    - name: Install IT-Tools
+      ansible.builtin.include_role:
+        name: it_tools
+      tags: it_tools
+
+    - name: Install Networking-Toolbox
+      ansible.builtin.include_role:
+        name: networking_toolbox
+      tags: networking_toolbox
+
+    - name: Install Speedtest-Tracker
+      ansible.builtin.include_role:
+        name: speedtest_tracker
+      tags: speedtest_tracker
+
+    - name: Install Termix
+      ansible.builtin.include_role:
+        name: termix
+      tags: termix
