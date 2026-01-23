@@ -4,7 +4,7 @@ version: '3'
 vars:
   TOOLS_HOST: "tools.{{.GLOBAL_DOMAIN}}"
   TOOLS_TF_DIR: "{{.TERRAFORM_DIR}}/tools"
-  TOOLS_ANSIBLE_PLAYBOOK: "tools-provision.yml"
+  TOOLS_ANSIBLE_PLAYBOOK: "lxc-tools-provision.yml"
 
 tasks:
   check:
@@ -51,3 +51,39 @@ tasks:
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.TOOLS_ANSIBLE_PLAYBOOK}} --tag traefik"
+
+  provision-atuin:
+    desc: "Provision 'Atuin' on '{{.TOOLS_HOST}}'"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.TOOLS_ANSIBLE_PLAYBOOK}} --tag atuin"
+
+  provision-dumbpad:
+    desc: "Provision 'DumbPad' on '{{.TOOLS_HOST}}'"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.TOOLS_ANSIBLE_PLAYBOOK}} --tag dumbpad"
+
+  provision-it-tools:
+    desc: "Provision 'IT-Tools' on '{{.TOOLS_HOST}}'"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.TOOLS_ANSIBLE_PLAYBOOK}} --tag it_tools"
+
+  provision-networking-toolbox:
+    desc: "Provision 'Networking-Toolbox' on '{{.TOOLS_HOST}}'"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.TOOLS_ANSIBLE_PLAYBOOK}} --tag networking_toolbox"
+
+  provision-speedtest-tracker:
+    desc: Provision "Speedtest Tracker" on '{{.TOOLS_HOST}}'"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.TOOLS_ANSIBLE_PLAYBOOK}} --tag speedtest_tracker"
+
+  provision-termix:
+    desc: "Provision 'Termix' on '{{.TOOLS_HOST}}'"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.TOOLS_ANSIBLE_PLAYBOOK}} --tag termix"

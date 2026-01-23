@@ -1,0 +1,74 @@
+---
+services:
+  atuin:
+    image: "ghcr.io/atuinsh/atuin:{{ atuin_version }}"
+    container_name: "atuin"
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    command: server start
+    user: "0:0"
+    networks:
+      - traefik_default
+    volumes:
+      - ./config:/config
+    ports:
+      - "{{ atuin_port }}:{{ atuin_port }}"
+    environment:
+      ATUIN_HOST: "0.0.0.0"
+      ATUIN_OPEN_REGISTRATION: "true"
+      ATUIN_DB_URI: postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@db/$POSTGRES_DB
+      RUST_LOG: info,atuin_server=debug
+    depends_on:
+      - db
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.atuin.entrypoints=http"
+      - "traefik.http.routers.atuin.rule=Host(`{{ atuin_uri }}`)"
+      - "traefik.http.middlewares.atuin-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.atuin.middlewares=atuin-https-redirect"
+      - "traefik.http.routers.atuin-secure.entrypoints=https"
+      - "traefik.http.routers.atuin-secure.rule=Host(`{{ atuin_uri }}`)"
+      - "traefik.http.routers.atuin-secure.tls=true"
+      - "traefik.http.routers.atuin-secure.service=atuin"
+      - "traefik.http.services.atuin.loadbalancer.server.port={{ atuin_port }}"
+      - "traefik.docker.network=traefik_default"
+
+  db:
+    image: postgres:14
+    container_name: "atuin-db"
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - traefik_default
+    volumes:
+      - {{ atuin_directory }}/database/:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_DB: $POSTGRES_DB
+
+  backup:
+    image: prodrigestivill/postgres-backup-local
+    container_name: "atuin-db-backups"
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - traefik_default
+    volumes:
+      - {{ atuin_directory }}/db_dumps:/db_dumps
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_DB: $POSTGRES_DB
+      SCHEDULE: "@daily"
+      BACKUP_DIR: /db_dumps
+    depends_on:
+      - db
+
+networks:
+  traefik_default:
+    external: true

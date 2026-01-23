@@ -4,7 +4,7 @@ version: '3'
 vars:
   GRAFIX_HOST: "grafix.{{.GLOBAL_DOMAIN}}"
   GRAFIX_TF_DIR: "{{.TERRAFORM_DIR}}/grafix"
-  GRAFIX_ANSIBLE_PLAYBOOK: "grafix-provision.yml"
+  GRAFIX_ANSIBLE_PLAYBOOK: "lxc-grafix-provision.yml"
 
 tasks:
   check:

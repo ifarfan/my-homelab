@@ -4,7 +4,7 @@ version: '3'
 vars:
   DEVBOX_HOST: "devbox.{{.GLOBAL_DOMAIN}}"
   DEVBOX_TF_DIR: "{{.TERRAFORM_DIR}}/devbox"
-  DEVBOX_ANSIBLE_PLAYBOOK: "devbox-provision.yml"
+  DEVBOX_ANSIBLE_PLAYBOOK: "lxc-devbox-provision.yml"
 
 tasks:
   check:

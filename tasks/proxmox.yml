@@ -6,22 +6,22 @@ tasks:
     dir: "{{.ANSIBLE_DIR}}"
     desc: List Proxmox nodes
     cmds:
-      - ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} proxmox-provision.yml --list-hosts
+      - ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} proxmox-nodes-provision.yml --list-hosts
 
   provision-nodes:
     dir: "{{.ANSIBLE_DIR}}"
     desc: Provision Proxmox nodes
     cmds:
-      - ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} proxmox-provision.yml
+      - ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} proxmox-nodes-provision.yml
 
   update-nodes:
     dir: "{{.ANSIBLE_DIR}}"
     desc: Update Proxmox nodes
     cmds:
-      - ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} proxmox-update.yml
+      - ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} proxmox-nodes-update.yml
 
   reboot-nodes:
     dir: "{{.ANSIBLE_DIR}}"
     desc: Reboot Proxmox nodes
     cmds:
-      - ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} proxmox-reboot.yml
+      - ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} proxmox-nodes-reboot.yml

@@ -4,7 +4,7 @@ version: '3'
 vars:
   NET_HOST: "net.{{.GLOBAL_DOMAIN}}"
   NET_TF_DIR: "{{.TERRAFORM_DIR}}/net"
-  NET_ANSIBLE_PLAYBOOK: "net-provision.yml"
+  NET_ANSIBLE_PLAYBOOK: "lxc-net-provision.yml"
 
 tasks:
   check:
