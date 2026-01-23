@@ -3,16 +3,23 @@
 # - lxc_hostname: LXC hostname
 # - lxc_id: LXC vm ID
 # - lxc_proxmox_node: Proxmox node where LXC is hosted
-# - lxc_patch: types are "network"
+# - lxc_patch: types are "devtun", "gpu"
 - name: Patch LXC directly on Proxmox node
   hosts: "{{ lxc_proxmox_node | split('.') | first }}"
   become: true
   gather_facts: true
   tasks:
+    - name: Wait for LXC to be ready
+      ansible.builtin.wait_for:
+        host: "{{ lxc_hostname }}"
+        port: 22
+        delay: 10
+        timeout: 60
+
     #
-    # ? Reboot, if LXC just created or modified
+    # ? Reboot, if LXC just created or modified, before additional patching
     #
-    - name: Determine if LXC needs reboot
+    - name: Determine if LXC is fresh and needs a reboot
       ansible.builtin.find:
         paths: /etc/pve/lxc/
         patterns: "{{ lxc_id }}.conf"
@@ -46,11 +53,10 @@
       when: pending_reboot.matched > 0
 
     #
-    # ? Patch LXC: "Network"
-    # This patch allows TUN/TAP device usage inside the LXC container
-    # NOT: don't use dynamic text on blockinfile, it triggers a reboot loop
+    # ? Patch LXC: "devtun"
+    # ? Patch allows TUN/TAP device usage inside the LXC container
     #
-    - name: Patch LXC with "network" config
+    - name: Patch LXC with "devtun" config
       block:
         - name: Determine if patch has been applied
           ansible.builtin.find:
@@ -59,7 +65,7 @@
             file_type: file
             contains: 'lxc.mount.entry: /dev/net/tun'
             read_whole_file: true
-          register: pending_patch_reboot
+          register: already_patched
 
         - name: Apply patch and reboot
           block:
@@ -93,5 +99,55 @@
                 port: 22
                 delay: 10
                 timeout: 60
-          when: pending_patch_reboot.matched == 0
-      when: lxc_patch == 'network'
+          when: already_patched.matched == 0
+      when: lxc_patch == 'devtun'
+
+    #
+    # ? Patch LXC: "GPU"
+    # ? Enable GPU passthru to LXC container
+    # - https://www.reddit.com/r/Proxmox/comments/1j7g2hs/a_quick_guide_on_how_to_setup_igpu_passthrough/?captcha=1
+    # - https://github.com/community-scripts/ProxmoxVE/blob/0fcc2dd3f339c9e91cd77f506e98f6014686db46/misc/build.func#L3540
+    #
+    - name: Patch LXC with "gpu" config
+      block:
+        - name: Determine if patch has been applied
+          ansible.builtin.find:
+            paths: /etc/pve/lxc/
+            patterns: "{{ lxc_id }}.conf"
+            file_type: file
+            contains: '/dev/dri/render'
+            read_whole_file: true
+          register: already_patched
+
+        - name: Apply patch and reboot
+          block:
+            - name: Run "pct set" command to add GPU device
+              ansible.builtin.shell: |
+                RENDER_GID=$(/usr/sbin/pct exec {{ lxc_id }} getent group render | cut -d: -f3)
+                /usr/sbin/pct set {{ lxc_id }} -dev0 /dev/dri/renderD128,gid=$RENDER_GID
+              register: pct_set_cmd
+              changed_when: false
+
+            - name: Report "pct set" output
+              ansible.builtin.debug:
+                msg: "{{ pct_set_cmd }}"
+              changed_when: false
+
+            - name: Reboot LXC container
+              ansible.builtin.command: /usr/sbin/pct reboot {{ lxc_id }}
+              register: reboot_cmd
+              changed_when: false
+
+            - name: Report reboot output
+              ansible.builtin.debug:
+                msg: "{{ reboot_cmd }}"
+              changed_when: false
+
+            - name: Wait for LXC to be ready
+              ansible.builtin.wait_for:
+                host: "{{ lxc_hostname }}"
+                port: 22
+                delay: 10
+                timeout: 60
+          when: already_patched.matched == 0
+      when: lxc_patch == 'gpu'
