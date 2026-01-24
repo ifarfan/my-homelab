@@ -1,0 +1,38 @@
+---
+- name: Install Arr Stack
+  block:
+    - name: Install NFS client and mount volumes
+      ansible.builtin.include_role:
+        name: nfs_client
+      vars:
+        nfs_client_mounts:
+          - { volume: books, path: /mnt/books, rights: rw }
+          - { volume: downloads, path: /mnt/downloads, rights: rw }
+          - { volume: movies, path: /mnt/movies, rights: rw }
+          - { volume: stash, path: /mnt/stash, rights: rw }
+          - { volume: tv, path: /mnt/tv, rights: rw }
+
+    - name: Create app directory
+      ansible.builtin.file:
+        path: "{{ arr_directory }}"
+        state: directory
+        mode: 0755
+
+    - name: Copy docker-compose file
+      ansible.builtin.template:
+        src: docker-compose.yml.j2
+        dest: "{{ arr_directory }}/docker-compose.yml"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Create and start app
+      community.docker.docker_compose_v2:
+        project_src: "{{ arr_directory }}"
+        recreate: always
+        pull: missing
+        remove_orphans: true
+        remove_volumes: true
+        state: restarted
+
+  tags: arr_stack
