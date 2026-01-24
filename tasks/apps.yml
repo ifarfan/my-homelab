@@ -81,4 +81,3 @@ tasks:
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.APPS_ANSIBLE_PLAYBOOK}} --tag mealie"
-
