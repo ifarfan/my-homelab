@@ -3,6 +3,7 @@ version: '3'
 
 vars:
   RPI_TF_DIR: "{{.TERRAFORM_DIR}}/rpi"
+  RPI_TF_STATE: "{{.TERRAFORM_STATE}}/rpi.tfstate"
   RPI_ANSIBLE_INVENTORY: "inventories/rpi"
   # ? Pre-provisioned RPis
   RPI_LOCAL_ANSIBLE_PLAYBOOK: "rpi-pre-provision.yml"
@@ -15,11 +16,11 @@ tasks:
     desc: "Update DNS records for RPi hosts"
     dir: "{{.RPI_TF_DIR}}"
     cmds:
-      - terraform init
+      - terraform init -backend-config="path={{.RPI_TF_STATE}}"
       - terraform fmt && terraform validate
-      - terraform apply -compact-warnings -target=cloudflare_record.cname_records -target=cloudflare_record.dns_record
+      - terraform apply -lock=false -compact-warnings -target=cloudflare_record.cname_records -target=cloudflare_record.dns_record
 
-  # ? Ansible (pre-provisioned RPis)
+  # ? Ansible (pre-provisioned RPis commands)
   list-rpis-local:
     dir: "{{.ANSIBLE_DIR}}"
     desc: List RPis local

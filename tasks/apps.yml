@@ -4,6 +4,7 @@ version: '3'
 vars:
   APPS_HOST: "apps.{{.GLOBAL_DOMAIN}}"
   APPS_TF_DIR: "{{.TERRAFORM_DIR}}/apps"
+  APPS_TF_STATE: "{{.TERRAFORM_STATE}}/apps.tfstate"
   APPS_ANSIBLE_PLAYBOOK: "lxc-apps-provision.yml"
 
 tasks:
@@ -20,24 +21,24 @@ tasks:
     desc: "Create '{{.APPS_HOST}}' host"
     dir: "{{.APPS_TF_DIR}}"
     cmds:
-      - terraform init
+      - terraform init -backend-config="path={{.APPS_TF_STATE}}"
       - terraform fmt && terraform validate
-      - terraform apply
+      - terraform apply -lock=false
       - terraform output
 
   destroy-lxc:
     desc: "Destroy '{{.APPS_HOST}}' host"
     dir: "{{.APPS_TF_DIR}}"
     cmds:
-      - terraform destroy -compact-warnings
+      - terraform destroy -lock=false -compact-warnings
 
   update-dns:
     desc: "Update DNS records for '{{.APPS_HOST}}' host"
     dir: "{{.APPS_TF_DIR}}"
     cmds:
-      - terraform init
+      - terraform init -backend-config="path={{.APPS_TF_STATE}}"
       - terraform fmt && terraform validate
-      - terraform apply -compact-warnings -target=module.my_lxc.cloudflare_record.cname_records
+      - terraform apply -lock=false -compact-warnings -target=module.my_lxc.cloudflare_record.cname_records
 
   # ? Ansible
   provision:

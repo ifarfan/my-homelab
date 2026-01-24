@@ -4,6 +4,7 @@ version: '3'
 vars:
   TOOLS_HOST: "tools.{{.GLOBAL_DOMAIN}}"
   TOOLS_TF_DIR: "{{.TERRAFORM_DIR}}/tools"
+  TOOLS_TF_STATE: "{{.TERRAFORM_STATE}}/tools.tfstate"
   TOOLS_ANSIBLE_PLAYBOOK: "lxc-tools-provision.yml"
 
 tasks:
@@ -20,24 +21,24 @@ tasks:
     desc: "Create '{{.TOOLS_HOST}}' host"
     dir: "{{.TOOLS_TF_DIR}}"
     cmds:
-      - terraform init
+      - terraform init -backend-config="path={{.TOOLS_TF_STATE}}"
       - terraform fmt && terraform validate
-      - terraform apply
+      - terraform apply -lock=false
       - terraform output
 
   destroy-lxc:
     desc: "Destroy '{{.TOOLS_HOST}}' host"
     dir: "{{.TOOLS_TF_DIR}}"
     cmds:
-      - terraform destroy -compact-warnings
+      - terraform destroy -lock=false -compact-warnings
 
   update-dns:
     desc: "Update DNS records for '{{.TOOLS_HOST}}' host"
     dir: "{{.TOOLS_TF_DIR}}"
     cmds:
-      - terraform init
+      - terraform init -backend-config="path={{.TOOLS_TF_STATE}}"
       - terraform fmt && terraform validate
-      - terraform apply -compact-warnings -target=module.my_lxc.cloudflare_record.cname_records
+      - terraform apply -lock=false -compact-warnings -target=module.my_lxc.cloudflare_record.cname_records
 
   # ? Ansible
   provision:

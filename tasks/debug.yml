@@ -4,6 +4,7 @@ version: '3'
 vars:
   DEBUG_HOST: "debug.{{.GLOBAL_DOMAIN}}"
   DEBUG_TF_DIR: "{{.TERRAFORM_DIR}}/debug"
+  DEBUG_TF_STATE: "{{.TERRAFORM_STATE}}/debug.tfstate"
   DEBUG_ANSIBLE_PLAYBOOK: "lxc-debug-provision.yml"
 
 tasks:
@@ -20,24 +21,24 @@ tasks:
     desc: "Create '{{.DEBUG_HOST}}' host"
     dir: "{{.DEBUG_TF_DIR}}"
     cmds:
-      - terraform init
+      - terraform init -backend-config="path={{.DEBUG_TF_STATE}}"
       - terraform fmt && terraform validate
-      - terraform apply
+      - terraform apply -lock=false
       - terraform output
 
   destroy-lxc:
     desc: "Destroy '{{.DEBUG_HOST}}' host"
     dir: "{{.DEBUG_TF_DIR}}"
     cmds:
-      - terraform destroy -compact-warnings
+      - terraform destroy -lock=false -compact-warnings
 
   update-dns:
     desc: "Update DNS records for '{{.DEBUG_HOST}}' host"
     dir: "{{.DEBUG_TF_DIR}}"
     cmds:
-      - terraform init
+      - terraform init -backend-config="path={{.DEBUG_TF_STATE}}"
       - terraform fmt && terraform validate
-      - terraform apply -compact-warnings -target=module.my_lxc.cloudflare_record.cname_records
+      - terraform apply -lock=false -compact-warnings -target=module.my_lxc.cloudflare_record.cname_records
 
   # ? Ansible
   provision:
