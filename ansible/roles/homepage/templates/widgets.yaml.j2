@@ -1,0 +1,33 @@
+---
+# For configuration options and examples, please see:
+# https://github.com/benphelps/homepage/wiki/Information-Widgets
+- search:
+    provider: [google, bing, duckduckgo]
+    target: _blank
+
+- openweathermap:
+    label: Philadelphia
+    latitude: 39.98
+    longitude: -75.13
+    units: imperial
+    provider: openweathermap
+    apiKey: {{ homepage_openweathermap_api }}
+    cache: 5
+    format:
+      maximumFractionDigits: 0
+
+- glances:
+    url: https://{{ glances_uri }}
+    username: {{ glances_username }}
+    password: {{ glances_password }}
+    version: 4
+    cpu: true
+    mem: true
+    cputemp: true
+    uptime: true
+    disk:
+      - /
+      - /mnt/docker
+      - /mnt/opt
+    diskUnits: bytes
+    expanded: true

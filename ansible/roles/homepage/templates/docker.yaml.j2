@@ -1,0 +1,26 @@
+---
+# For configuration options and examples, please see:
+# - https://gethomepage.dev/configs/services/#docker-integration
+# - https://gethomepage.dev/configs/docker/
+apps-local-docker:
+  socket: /var/run/docker.sock
+
+devbox-docker:
+  host: devbox-lxc.{{ global_domain }}
+  port: 2375
+
+arr-docker:
+  host: arr-lxc.{{ global_domain }}
+  port: 2375
+
+net-docker:
+  host: net-lxc.{{ global_domain }}
+  port: 2375
+
+rpi0-docker:
+  host: rpi0.{{ global_domain }}
+  port: 2375
+
+rpi1-docker:
+  host: rpi1.{{ global_domain }}
+  port: 2375

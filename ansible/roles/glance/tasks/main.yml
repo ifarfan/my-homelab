@@ -1,0 +1,97 @@
+---
+- name: Install glance
+  block:
+    - name: Create app directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: 0755
+      loop:
+        - "{{ glance_directory }}"
+        - "{{ glance_directory }}/assets"
+        - "{{ glance_directory }}/config"
+
+    - name: Copy secure .ENV file
+      ansible.builtin.template:
+        src: .env.j2
+        dest: "{{ glance_directory }}/.env"
+        owner: root
+        group: root
+        mode: 0600
+
+    - name: Copy docker-compose file
+      ansible.builtin.template:
+        src: docker-compose.yml.j2
+        dest: "{{ glance_directory }}/docker-compose.yml"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: List of local "config" files
+      ansible.builtin.command:
+        ls -1 "{{ role_path }}/files/config/"
+      delegate_to: localhost
+      become: false
+      changed_when: false
+      register: managed_files
+
+    - name: List of remote "config" files
+      ansible.builtin.command:
+        ls -1 "/{{ glance_directory }}/config/"
+      register: unmanaged_files
+      changed_when: false
+
+    - name: Remove remote "unmanaged" config files but leave "managed" files
+      ansible.builtin.file:
+        path: "/{{ glance_directory }}/config/{{ item }}"
+        state: absent
+      loop: "{{ unmanaged_files.stdout_lines }}"
+      when: item not in managed_files.stdout_lines
+
+    - name: Copy app "config" files
+      ansible.builtin.copy:
+        src: "config/{{ item }}"
+        dest: "{{ glance_directory }}/config/{{ item }}"
+        owner: root
+        group: root
+        mode: 0644
+      loop: "{{ managed_files.stdout_lines }}"
+
+    - name: List of local "assets" files
+      ansible.builtin.command:
+        ls -1 "{{ role_path }}/files/assets/"
+      delegate_to: localhost
+      become: false
+      changed_when: false
+      register: assets_files
+
+    - name: Copy app "assets" files
+      ansible.builtin.copy:
+        src: "assets/{{ item }}"
+        dest: "{{ glance_directory }}/assets/{{ item }}"
+        owner: root
+        group: root
+        mode: 0644
+      loop: "{{ assets_files.stdout_lines }}"
+
+    - name: Create and start app
+      community.docker.docker_compose_v2:
+        project_src: "{{ glance_directory }}"
+        recreate: always
+        pull: missing
+        remove_orphans: true
+        remove_volumes: true
+        state: restarted
+
+    - name: Wait until certificate is registered
+      ansible.builtin.uri:
+        url: "https://{{ glance_uri }}/"
+        validate_certs: true
+        status_code:
+          - 200
+      register: uri_output
+      until: uri_output.status == 200
+      delay: 10
+      retries: 30       # Retries for 30 * 10 secs = 300 secs = 5 mins
+
+  tags: glance

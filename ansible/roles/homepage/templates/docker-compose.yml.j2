@@ -1,0 +1,35 @@
+---
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:{{ homepage_image_version }}
+    container_name: homepage
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - traefik_default
+    volumes:
+      - {{ homepage_directory_config }}:/app/config
+      # needed to monitor/report on other running containers
+      - /var/run/docker.sock:/var/run/docker.sock
+      # volumes can't be RO, else "resource" widgets can't report them
+      - /opt:/mnt/opt
+      - /var/lib/docker:/mnt/docker
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: "*"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homepage.entrypoints=http"
+      - "traefik.http.routers.homepage.rule=Host(`{{ homepage_uri }}`)"
+      - "traefik.http.middlewares.homepage-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.homepage.middlewares=homepage-https-redirect"
+      - "traefik.http.routers.homepage-secure.entrypoints=https"
+      - "traefik.http.routers.homepage-secure.rule=Host(`{{ homepage_uri }}`)"
+      - "traefik.http.routers.homepage-secure.tls=true"
+      - "traefik.http.routers.homepage-secure.service=homepage"
+      - "traefik.http.services.homepage.loadbalancer.server.port={{ homepage_port }}"
+      - "traefik.docker.network=traefik_default"
+
+networks:
+  traefik_default:
+    external: true

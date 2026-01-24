@@ -1,0 +1,18 @@
+-
+  type: markets
+  title: crypto
+  sort-by: change
+  symbol-link-template: https://finance.yahoo.com/quote/{SYMBOL}/
+  markets:
+    -
+      symbol: BTC-USD
+      name: Bitcoin
+    -
+      symbol: ETH-USD
+      name: Ethereum
+    -
+      symbol: SOL-USD
+      name: Solana
+    -
+      symbol: ADA-USD
+      name: Cardano
