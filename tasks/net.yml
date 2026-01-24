@@ -4,6 +4,7 @@ version: '3'
 vars:
   NET_HOST: "net.{{.GLOBAL_DOMAIN}}"
   NET_TF_DIR: "{{.TERRAFORM_DIR}}/net"
+  NET_TF_STATE: "{{.TERRAFORM_STATE}}/net.tfstate"
   NET_ANSIBLE_PLAYBOOK: "lxc-net-provision.yml"
 
 tasks:
@@ -21,9 +22,9 @@ tasks:
     desc: "Create '{{.NET_HOST}}' host"
     dir: "{{.NET_TF_DIR}}"
     cmds:
-      - terraform init
+      - terraform init -backend-config="path={{.NET_TF_STATE}}"
       - terraform fmt && terraform validate
-      - terraform apply
+      - terraform apply -lock=false
       - terraform output
 
   ansible-post-run:
@@ -54,15 +55,15 @@ tasks:
     desc: "Destroy '{{.NET_HOST}}' host"
     dir: "{{.NET_TF_DIR}}"
     cmds:
-      - terraform destroy -compact-warnings
+      - terraform destroy -lock=false -compact-warnings
 
   update-dns:
     desc: "Update DNS records for '{{.NET_HOST}}' host"
     dir: "{{.NET_TF_DIR}}"
     cmds:
-      - terraform init
+      - terraform init -backend-config="path={{.NET_TF_STATE}}"
       - terraform fmt && terraform validate
-      - terraform apply -compact-warnings -target=module.my_lxc.cloudflare_record.cname_records
+      - terraform apply -lock=false -compact-warnings -target=module.my_lxc.cloudflare_record.cname_records
 
   # ? Ansible
   provision:

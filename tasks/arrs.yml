@@ -30,7 +30,7 @@ tasks:
     desc: "Destroy '{{.ARRS_HOST}}' host"
     dir: "{{.ARRS_TF_DIR}}"
     cmds:
-      - terraform destroy -compact-warnings
+      - terraform destroy -lock=false -compact-warnings
 
   update-dns:
     desc: "Update DNS records for '{{.ARRS_HOST}}' host"

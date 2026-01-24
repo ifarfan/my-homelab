@@ -4,6 +4,7 @@ version: '3'
 vars:
   GRAFIX_HOST: "grafix.{{.GLOBAL_DOMAIN}}"
   GRAFIX_TF_DIR: "{{.TERRAFORM_DIR}}/grafix"
+  GRAFIX_TF_STATE: "{{.TERRAFORM_STATE}}/grafix.tfstate"
   GRAFIX_ANSIBLE_PLAYBOOK: "lxc-grafix-provision.yml"
 
 tasks:
@@ -21,9 +22,9 @@ tasks:
     desc: "Create '{{.GRAFIX_HOST}}' host"
     dir: "{{.GRAFIX_TF_DIR}}"
     cmds:
-      - terraform init
+      - terraform init -backend-config="path={{.GRAFIX_TF_STATE}}"
       - terraform fmt && terraform validate
-      - terraform apply
+      - terraform apply -lock=false
       - terraform output
 
   ansible-post-run:
@@ -54,15 +55,15 @@ tasks:
     desc: "Destroy '{{.GRAFIX_HOST}}' host"
     dir: "{{.GRAFIX_TF_DIR}}"
     cmds:
-      - terraform destroy -compact-warnings
+      - terraform destroy -lock=false -compact-warnings
 
   update-dns:
     desc: "Update DNS records for '{{.GRAFIX_HOST}}' host"
     dir: "{{.GRAFIX_TF_DIR}}"
     cmds:
-      - terraform init
+      - terraform init -backend-config="path={{.GRAFIX_TF_STATE}}"
       - terraform fmt && terraform validate
-      - terraform apply -compact-warnings -target=module.my_lxc.cloudflare_record.cname_records
+      - terraform apply -lock=false -compact-warnings -target=module.my_lxc.cloudflare_record.cname_records
 
   # ? Ansible
   provision:
