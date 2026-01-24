@@ -2,18 +2,19 @@
 version: '3'
 
 vars:
-  APPS_HOST: "apps.{{.GLOBAL_DOMAIN}}"
-  APPS_TF_DIR: "{{.TERRAFORM_DIR}}/apps"
-  APPS_TF_STATE: "{{.TERRAFORM_STATE}}/apps.tfstate"
-  APPS_ANSIBLE_PLAYBOOK: "lxc-apps-provision.yml"
+  APPS_VAR: "apps"
+  APPS_HOST: "{{.APPS_VAR}}.{{.GLOBAL_DOMAIN}}"
+  APPS_TF_DIR: "{{.TERRAFORM_DIR}}/{{.APPS_VAR}}"
+  APPS_TF_STATE: "{{.TERRAFORM_STATE}}/{{.APPS_VAR}}.tfstate"
+  APPS_ANSIBLE_PLAYBOOK: "lxc-{{.APPS_VAR}}-provision.yml"
 
 tasks:
   check:
     desc: "Check '{{.APPS_HOST}}' host vars"
-    dir: "{{.APPS_TF_DIR}}"
     cmds:
       - "echo APPS_HOST={{.APPS_HOST}}"
       - "echo APPS_TF_DIR={{.APPS_TF_DIR}}"
+      - "echo APPS_TF_STATE={{.APPS_TF_STATE}}"
       - "echo APPS_ANSIBLE_PLAYBOOK={{.APPS_ANSIBLE_PLAYBOOK}}"
 
   # ? Terraform

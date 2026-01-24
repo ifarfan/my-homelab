@@ -2,18 +2,19 @@
 version: '3'
 
 vars:
-  GRAFIX_HOST: "grafix.{{.GLOBAL_DOMAIN}}"
-  GRAFIX_TF_DIR: "{{.TERRAFORM_DIR}}/grafix"
-  GRAFIX_TF_STATE: "{{.TERRAFORM_STATE}}/grafix.tfstate"
-  GRAFIX_ANSIBLE_PLAYBOOK: "lxc-grafix-provision.yml"
+  GRAFIX_VAR: "grafix"
+  GRAFIX_HOST: "{{.GRAFIX_VAR}}.{{.GLOBAL_DOMAIN}}"
+  GRAFIX_TF_DIR: "{{.TERRAFORM_DIR}}/{{.GRAFIX_VAR}}"
+  GRAFIX_TF_STATE: "{{.TERRAFORM_STATE}}/{{.GRAFIX_VAR}}.tfstate"
+  GRAFIX_ANSIBLE_PLAYBOOK: "lxc-{{.GRAFIX_VAR}}-provision.yml"
 
 tasks:
   check:
     desc: "Check '{{.GRAFIX_HOST}}' host vars"
-    dir: "{{.GRAFIX_TF_DIR}}"
     cmds:
       - "echo GRAFIX_HOST={{.GRAFIX_HOST}}"
       - "echo GRAFIX_TF_DIR={{.GRAFIX_TF_DIR}}"
+      - "echo GRAFIX_TF_STATE={{.GRAFIX_TF_STATE}}"
       - "echo GRAFIX_ANSIBLE_PLAYBOOK={{.GRAFIX_ANSIBLE_PLAYBOOK}}"
 
   # ? Terraform
