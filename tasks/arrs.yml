@@ -1,0 +1,54 @@
+---
+version: '3'
+
+vars:
+  ARRS_HOST: "arrs.{{.GLOBAL_DOMAIN}}"
+  ARRS_TF_DIR: "{{.TERRAFORM_DIR}}/arrs"
+  ARRS_TF_STATE: "{{.TERRAFORM_STATE}}/arrs.tfstate"
+  ARRS_ANSIBLE_PLAYBOOK: "lxc-arrs-provision.yml"
+
+tasks:
+  check:
+    desc: "Check '{{.ARRS_HOST}}' host vars"
+    dir: "{{.ARRS_TF_DIR}}"
+    cmds:
+      - "echo ARRS_HOST={{.ARRS_HOST}}"
+      - "echo ARRS_TF_DIR={{.ARRS_TF_DIR}}"
+      - "echo ARRS_ANSIBLE_PLAYBOOK={{.ARRS_ANSIBLE_PLAYBOOK}}"
+
+  # ? Terraform
+  create-lxc:
+    desc: "Create '{{.ARRS_HOST}}' host"
+    dir: "{{.ARRS_TF_DIR}}"
+    cmds:
+      - terraform init -backend-config="path={{.ARRS_TF_STATE}}"
+      - terraform fmt && terraform validate
+      - terraform apply -lock=false
+      - terraform output
+
+  destroy-lxc:
+    desc: "Destroy '{{.ARRS_HOST}}' host"
+    dir: "{{.ARRS_TF_DIR}}"
+    cmds:
+      - terraform destroy -compact-warnings
+
+  update-dns:
+    desc: "Update DNS records for '{{.ARRS_HOST}}' host"
+    dir: "{{.ARRS_TF_DIR}}"
+    cmds:
+      - terraform init -backend-config="path={{.ARRS_TF_STATE}}"
+      - terraform fmt && terraform validate
+      - terraform apply -lock=false -compact-warnings -target=module.my_lxc.cloudflare_record.cname_records
+
+  # ? Ansible
+  provision:
+    desc: "Provision '{{.ARRS_HOST}}' via Ansible"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.ARRS_ANSIBLE_PLAYBOOK}}"
+
+  provision-traefik:
+    desc: "Provision 'Traefik' on '{{.ARRS_HOST}}'"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.ARRS_ANSIBLE_PLAYBOOK}} --tag traefik"

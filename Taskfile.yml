@@ -7,6 +7,7 @@ dotenv: ['.env']
 
 includes:
   apps: ./tasks/apps.yml
+  arrs: ./tasks/arrs.yml
   debug: ./tasks/debug.yml
   devbox: ./tasks/devbox.yml
   grafix: ./tasks/grafix.yml
@@ -21,6 +22,7 @@ vars:
   GLOBAL_DOMAIN: $MY_GLOBAL_DOMAIN
   PACKER_DIR: ./packer
   TERRAFORM_DIR: ./terraform
+  TERRAFORM_STATE: $MY_TERRAFORM_STATE
   WAIT_SECS_LONG: 120
   WAIT_SECS_MEDIUM: 30
   WAIT_SECS_SHORT: 5
