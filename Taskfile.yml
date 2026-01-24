@@ -6,6 +6,7 @@ version: '3'
 dotenv: ['.env']
 
 includes:
+  apps: ./tasks/apps.yml
   debug: ./tasks/debug.yml
   devbox: ./tasks/devbox.yml
   grafix: ./tasks/grafix.yml

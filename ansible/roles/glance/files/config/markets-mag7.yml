@@ -1,0 +1,27 @@
+-
+  type: markets
+  title: magnificent 7
+  sort-by: change
+  symbol-link-template: https://finance.yahoo.com/quote/{SYMBOL}/
+  markets:
+    -
+      symbol: AMZN
+      name: Amazon
+    -
+      symbol: AAPL
+      name: Apple
+    -
+      symbol: GOOGL
+      name: Google
+    -
+      symbol: META
+      name: Meta
+    -
+      symbol: MSFT
+      name: Microsoft
+    -
+      symbol: NVDA
+      name: NVIDIA
+    -
+      symbol: TSLA
+      name: Tesla

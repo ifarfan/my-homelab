@@ -1,0 +1,20 @@
+---
+- name: Install NFS client
+  ansible.builtin.apt:
+    name: "{{ nfs_pkgs }}"
+    state: present
+
+- name: Create NFS folders # noqa: risky-file-permissions
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+  loop: "{{ nfs_client_mounts }}"
+
+- name: Mount NFS volumes + add to /etc/fstab
+  ansible.posix.mount:
+    src: "{{ nfs_server }}:{{ nfs_volumes[item.volume] }}"
+    path: "{{ item.path }}"
+    fstype: nfs
+    opts: "{{ nfs_options_rw if item.rights == 'rw' else nfs_options_ro }}"
+    state: mounted
+  loop: "{{ nfs_client_mounts }}"

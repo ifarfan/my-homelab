@@ -1,0 +1,40 @@
+-
+  type: group
+  define-rss: &rss-properties
+    type: rss
+    style: vertical-list
+    limit: 20
+    collapse-after: 10
+    cache: 12h
+  define-hn: &hn-properties
+    limit: 20
+    collapse-after: 10
+  widgets:
+    -
+      title: selfh.st
+      <<: *rss-properties
+      feeds:
+        - url: https://selfh.st/rss/
+          title: selfh.st
+    -
+      title: Atom
+      <<: *rss-properties
+      feeds:
+        - url: https://ciechanow.ski/atom.xml
+          title: Atom
+        # - url: https://www.joshwcomeau.com/rss.xml
+        #   title: Josh Comeau
+        # - url: https://samwho.dev/rss.xml
+        # - url: https://ishadeed.com/feed.xml
+        #   title: Ahmad Shadeed
+    -
+      type: hacker-news
+      <<: *hn-properties
+      limit: 20
+      collapse-after: 10
+    -
+      type: lobsters
+      <<: *hn-properties
+      tags:
+        - job
+        - linux

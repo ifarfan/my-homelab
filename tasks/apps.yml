@@ -1,0 +1,83 @@
+---
+version: '3'
+
+vars:
+  APPS_HOST: "apps.{{.GLOBAL_DOMAIN}}"
+  APPS_TF_DIR: "{{.TERRAFORM_DIR}}/apps"
+  APPS_ANSIBLE_PLAYBOOK: "lxc-apps-provision.yml"
+
+tasks:
+  check:
+    desc: "Check '{{.APPS_HOST}}' host vars"
+    dir: "{{.APPS_TF_DIR}}"
+    cmds:
+      - "echo APPS_HOST={{.APPS_HOST}}"
+      - "echo APPS_TF_DIR={{.APPS_TF_DIR}}"
+      - "echo APPS_ANSIBLE_PLAYBOOK={{.APPS_ANSIBLE_PLAYBOOK}}"
+
+  # ? Terraform
+  create-lxc:
+    desc: "Create '{{.APPS_HOST}}' host"
+    dir: "{{.APPS_TF_DIR}}"
+    cmds:
+      - terraform init
+      - terraform fmt && terraform validate
+      - terraform apply
+      - terraform output
+
+  destroy-lxc:
+    desc: "Destroy '{{.APPS_HOST}}' host"
+    dir: "{{.APPS_TF_DIR}}"
+    cmds:
+      - terraform destroy -compact-warnings
+
+  update-dns:
+    desc: "Update DNS records for '{{.APPS_HOST}}' host"
+    dir: "{{.APPS_TF_DIR}}"
+    cmds:
+      - terraform init
+      - terraform fmt && terraform validate
+      - terraform apply -compact-warnings -target=module.my_lxc.cloudflare_record.cname_records
+
+  # ? Ansible
+  provision:
+    desc: "Provision '{{.APPS_HOST}}' via Ansible"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.APPS_ANSIBLE_PLAYBOOK}}"
+
+  provision-traefik:
+    desc: "Provision 'Traefik' on '{{.APPS_HOST}}'"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.APPS_ANSIBLE_PLAYBOOK}} --tag traefik"
+
+  provision-booklore:
+    desc: "Provision 'Booklore' on '{{.APPS_LXC_HOST}}'"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.APPS_ANSIBLE_PLAYBOOK}} --tag booklore"
+
+  provision-glance:
+    desc: "Provision 'Glance' on '{{.APPS_LXC_HOST}}'"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.APPS_ANSIBLE_PLAYBOOK}} --tag glance"
+
+  provision-homepage:
+    desc: "Provision 'Homepage' on '{{.APPS_LXC_HOST}}'"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.APPS_ANSIBLE_PLAYBOOK}} --tag homepage"
+
+  provision-jotty:
+    desc: Provision "Jotty" on '{{.APPS_LXC_HOST}}'"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.APPS_ANSIBLE_PLAYBOOK}} --tag jotty"
+
+  provision-mealie:
+    desc: "Provision 'Mealie' on '{{.APPS_LXC_HOST}}'"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.APPS_ANSIBLE_PLAYBOOK}} --tag mealie"
