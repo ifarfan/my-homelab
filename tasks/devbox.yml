@@ -2,18 +2,19 @@
 version: '3'
 
 vars:
-  DEVBOX_HOST: "devbox.{{.GLOBAL_DOMAIN}}"
-  DEVBOX_TF_DIR: "{{.TERRAFORM_DIR}}/devbox"
-  DEVBOX_TF_STATE: "{{.TERRAFORM_STATE}}/devbox.tfstate"
-  DEVBOX_ANSIBLE_PLAYBOOK: "lxc-devbox-provision.yml"
+  DEVBOX_VAR: "devbox"
+  DEVBOX_HOST: "{{.DEVBOX_VAR}}.{{.GLOBAL_DOMAIN}}"
+  DEVBOX_TF_DIR: "{{.TERRAFORM_DIR}}/{{.DEVBOX_VAR}}"
+  DEVBOX_TF_STATE: "{{.TERRAFORM_STATE}}/{{.DEVBOX_VAR}}.tfstate"
+  DEVBOX_ANSIBLE_PLAYBOOK: "lxc-{{.DEVBOX_VAR}}-provision.yml"
 
 tasks:
   check:
     desc: "Check '{{.DEVBOX_HOST}}' host vars"
-    dir: "{{.DEVBOX_TF_DIR}}"
     cmds:
       - "echo DEVBOX_HOST={{.DEVBOX_HOST}}"
       - "echo DEVBOX_TF_DIR={{.DEVBOX_TF_DIR}}"
+      - "echo DEVBOX_TF_STATE={{.DEVBOX_TF_STATE}}"
       - "echo DEVBOX_ANSIBLE_PLAYBOOK={{.DEVBOX_ANSIBLE_PLAYBOOK}}"
 
   # ? Terraform

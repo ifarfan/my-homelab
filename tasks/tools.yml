@@ -2,18 +2,19 @@
 version: '3'
 
 vars:
-  TOOLS_HOST: "tools.{{.GLOBAL_DOMAIN}}"
-  TOOLS_TF_DIR: "{{.TERRAFORM_DIR}}/tools"
-  TOOLS_TF_STATE: "{{.TERRAFORM_STATE}}/tools.tfstate"
-  TOOLS_ANSIBLE_PLAYBOOK: "lxc-tools-provision.yml"
+  TOOLS_VAR: "tools"
+  TOOLS_HOST: "{{.TOOLS_VAR}}.{{.GLOBAL_DOMAIN}}"
+  TOOLS_TF_DIR: "{{.TERRAFORM_DIR}}/{{.TOOLS_VAR}}"
+  TOOLS_TF_STATE: "{{.TERRAFORM_STATE}}/{{.TOOLS_VAR}}.tfstate"
+  TOOLS_ANSIBLE_PLAYBOOK: "lxc-{{.TOOLS_VAR}}-provision.yml"
 
 tasks:
   check:
     desc: "Check '{{.TOOLS_HOST}}' host vars"
-    dir: "{{.TOOLS_TF_DIR}}"
     cmds:
       - "echo TOOLS_HOST={{.TOOLS_HOST}}"
       - "echo TOOLS_TF_DIR={{.TOOLS_TF_DIR}}"
+      - "echo TOOLS_TF_STATE={{.TOOLS_TF_STATE}}"
       - "echo TOOLS_ANSIBLE_PLAYBOOK={{.TOOLS_ANSIBLE_PLAYBOOK}}"
 
   # ? Terraform

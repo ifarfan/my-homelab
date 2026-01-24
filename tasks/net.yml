@@ -2,18 +2,19 @@
 version: '3'
 
 vars:
-  NET_HOST: "net.{{.GLOBAL_DOMAIN}}"
-  NET_TF_DIR: "{{.TERRAFORM_DIR}}/net"
-  NET_TF_STATE: "{{.TERRAFORM_STATE}}/net.tfstate"
-  NET_ANSIBLE_PLAYBOOK: "lxc-net-provision.yml"
+  NET_VAR: "net"
+  NET_HOST: "{{.NET_VAR}}.{{.GLOBAL_DOMAIN}}"
+  NET_TF_DIR: "{{.TERRAFORM_DIR}}/{{.NET_VAR}}"
+  NET_TF_STATE: "{{.TERRAFORM_STATE}}/{{.NET_VAR}}.tfstate"
+  NET_ANSIBLE_PLAYBOOK: "lxc-{{.NET_VAR}}-provision.yml"
 
 tasks:
   check:
     desc: "Check '{{.NET_HOST}}' host vars"
-    dir: "{{.NET_TF_DIR}}"
     cmds:
       - "echo NET_HOST={{.NET_HOST}}"
       - "echo NET_TF_DIR={{.NET_TF_DIR}}"
+      - "echo NET_TF_STATE={{.NET_TF_STATE}}"
       - "echo NET_ANSIBLE_PLAYBOOK={{.NET_ANSIBLE_PLAYBOOK}}"
 
   # ? Terraform

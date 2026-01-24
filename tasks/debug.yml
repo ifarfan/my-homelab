@@ -2,18 +2,19 @@
 version: '3'
 
 vars:
-  DEBUG_HOST: "debug.{{.GLOBAL_DOMAIN}}"
-  DEBUG_TF_DIR: "{{.TERRAFORM_DIR}}/debug"
-  DEBUG_TF_STATE: "{{.TERRAFORM_STATE}}/debug.tfstate"
-  DEBUG_ANSIBLE_PLAYBOOK: "lxc-debug-provision.yml"
+  DEBUG_VAR: "debug"
+  DEBUG_HOST: "{{.DEBUG_VAR}}.{{.GLOBAL_DOMAIN}}"
+  DEBUG_TF_DIR: "{{.TERRAFORM_DIR}}/{{.DEBUG_VAR}}"
+  DEBUG_TF_STATE: "{{.TERRAFORM_STATE}}/{{.DEBUG_VAR}}.tfstate"
+  DEBUG_ANSIBLE_PLAYBOOK: "lxc-{{.DEBUG_VAR}}-provision.yml"
 
 tasks:
   check:
     desc: "Check '{{.DEBUG_HOST}}' host vars"
-    dir: "{{.DEBUG_TF_DIR}}"
     cmds:
       - "echo DEBUG_HOST={{.DEBUG_HOST}}"
       - "echo DEBUG_TF_DIR={{.DEBUG_TF_DIR}}"
+      - "echo DEBUG_TF_STATE={{.DEBUG_TF_STATE}}"
       - "echo DEBUG_ANSIBLE_PLAYBOOK={{.DEBUG_ANSIBLE_PLAYBOOK}}"
 
   # ? Terraform

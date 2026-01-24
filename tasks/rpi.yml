@@ -2,15 +2,25 @@
 version: '3'
 
 vars:
-  RPI_TF_DIR: "{{.TERRAFORM_DIR}}/rpi"
-  RPI_TF_STATE: "{{.TERRAFORM_STATE}}/rpi.tfstate"
-  RPI_ANSIBLE_INVENTORY: "inventories/rpi"
+  RPI_VAR: "rpi"
+  RPI_TF_DIR: "{{.TERRAFORM_DIR}}/{{.RPI_VAR}}"
+  RPI_TF_STATE: "{{.TERRAFORM_STATE}}/{{.RPI_VAR}}.tfstate"
+  RPI_ANSIBLE_INVENTORY: "inventories/{{.RPI_VAR}}"
   # ? Pre-provisioned RPis
-  RPI_LOCAL_ANSIBLE_PLAYBOOK: "rpi-pre-provision.yml"
+  RPI_LOCAL_ANSIBLE_PLAYBOOK: "{{.RPI_VAR}}-pre-provision.yml"
   # ? Provisioned RPis
-  RPI_ANSIBLE_PLAYBOOK: "rpi-provision.yml"
+  RPI_ANSIBLE_PLAYBOOK: "{{.RPI_VAR}}-provision.yml"
 
 tasks:
+  check:
+    desc: "Check '{{.RPI_VAR}}' host vars"
+    cmds:
+      - "echo RPI_TF_DIR={{.RPI_TF_DIR}}"
+      - "echo RPI_TF_STATE={{.RPI_TF_STATE}}"
+      - "echo RPI_ANSIBLE_INVENTORY={{.RPI_ANSIBLE_INVENTORY}}"
+      - "echo RPI_LOCAL_ANSIBLE_PLAYBOOK={{.RPI_LOCAL_ANSIBLE_PLAYBOOK}}"
+      - "echo RPI_ANSIBLE_PLAYBOOK={{.RPI_ANSIBLE_PLAYBOOK}}"
+
   # ? Terraform
   update-dns:
     desc: "Update DNS records for RPi hosts"
