@@ -34,3 +34,16 @@
         name: dozzle
       vars:
         is_agent: true
+
+    # ? Docker apps
+    - name: Install Traefik
+      ansible.builtin.include_role:
+        name: traefik
+      vars:
+        hostname_in_uri: true
+      tags: traefik
+
+    - name: Install Wakapi
+      ansible.builtin.include_role:
+        name: wakapi
+      tags: wakapi
