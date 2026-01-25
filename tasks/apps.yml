@@ -39,7 +39,12 @@ tasks:
     cmds:
       - terraform init -backend-config="path={{.APPS_TF_STATE}}"
       - terraform fmt && terraform validate
-      - terraform apply -lock=false -compact-warnings -target=module.my_lxc.cloudflare_record.cname_records
+      - |
+        terraform apply     \
+          -lock=false       \
+          -compact-warnings \
+          -parallelism=1    \
+          -target=module.my_lxc.cloudflare_record.cname_records
 
   # ? Ansible
   provision:
