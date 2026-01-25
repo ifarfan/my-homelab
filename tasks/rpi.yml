@@ -28,7 +28,13 @@ tasks:
     cmds:
       - terraform init -backend-config="path={{.RPI_TF_STATE}}"
       - terraform fmt && terraform validate
-      - terraform apply -lock=false -compact-warnings -target=cloudflare_record.cname_records -target=cloudflare_record.dns_record
+      - |
+        terraform apply                           \
+          -lock=false                             \
+          -compact-warnings                       \
+          -parallelism=1                          \
+          -target=cloudflare_record.cname_records \
+          -target=cloudflare_record.dns_record
 
   # ? Ansible (pre-provisioned RPis commands)
   list-rpis-local:

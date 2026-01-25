@@ -26,6 +26,17 @@ locals {
 
   # Additional DNS aliases/CNAMEs
   dns_aliases = [
+    "bazarr",
+    "flaresolverr",
+    "lazylibrarian",
+    "lidarr",
+    "metube",
+    "prowlarr",
+    "qbittorrent",
+    "radarr",
+    "sonarr",
+    "stash",
     "traefik-${local.hostname}",
+    "whisparr",
   ]
 }

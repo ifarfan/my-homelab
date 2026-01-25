@@ -7,6 +7,7 @@ vars:
   ARRS_TF_DIR: "{{.TERRAFORM_DIR}}/{{.ARRS_VAR}}"
   ARRS_TF_STATE: "{{.TERRAFORM_STATE}}/{{.ARRS_VAR}}.tfstate"
   ARRS_ANSIBLE_PLAYBOOK: "lxc-{{.ARRS_VAR}}-provision.yml"
+
 tasks:
   check:
     desc: "Check '{{.ARRS_HOST}}' host vars"
@@ -38,7 +39,12 @@ tasks:
     cmds:
       - terraform init -backend-config="path={{.ARRS_TF_STATE}}"
       - terraform fmt && terraform validate
-      - terraform apply -lock=false -compact-warnings -target=module.my_lxc.cloudflare_record.cname_records
+      - |
+        terraform apply     \
+          -lock=false       \
+          -compact-warnings \
+          -parallelism=1    \
+          -target=module.my_lxc.cloudflare_record.cname_records
 
   # ? Ansible
   provision:
