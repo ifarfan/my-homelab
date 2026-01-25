@@ -22,5 +22,7 @@ locals {
 
   # Additional DNS aliases/CNAMEs
   dns_aliases = [
+    "traefik-${local.hostname}",
+    "wakapi",
   ]
 }

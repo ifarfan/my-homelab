@@ -26,6 +26,12 @@ locals {
 
   # Additional DNS aliases/CNAMEs
   dns_aliases = [
+    "atuin",
+    "dumbpad",
+    "it-tools",
+    "networking-toolbox",
+    "speedtest-tracker",
+    "termix",
     "traefik-${local.hostname}",
   ]
 }

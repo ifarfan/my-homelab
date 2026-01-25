@@ -47,3 +47,15 @@ tasks:
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.DEVBOX_ANSIBLE_PLAYBOOK}}"
+
+  provision-traefik:
+    desc: "Provision 'Traefik' on '{{.DEVBOX_HOST}}'"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.DEVBOX_ANSIBLE_PLAYBOOK}} --tag traefik"
+
+  provision-wakapi:
+    desc: "Provision 'Wakapi' on '{{.DEVBOX_HOST}}'"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.DEVBOX_ANSIBLE_PLAYBOOK}} --tag wakapi"

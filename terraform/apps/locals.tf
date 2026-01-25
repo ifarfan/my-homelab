@@ -26,6 +26,13 @@ locals {
 
   # Additional DNS aliases/CNAMEs
   dns_aliases = [
+    "booklore",
+    "ephemera",
+    "glance",
+    "homepage",
+    "jotty",
+    "mealie",
+    "plex",
     "traefik-${local.hostname}",
   ]
 }
