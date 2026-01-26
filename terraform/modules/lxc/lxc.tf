@@ -3,7 +3,18 @@ resource "proxmox_lxc" "lxc" {
 
   hostname        = local.hostname
   description     = <<-EOT
-    ${local.description}
+    # ${local.description}
+
+    |            |                                      |
+    | ---------- |--------------------------------------|
+    | hostname   | `${local.hostname}`                  |
+    | ip         | `${local.network.ip}`                |
+    | cores      | `${local.cores}`                     |
+    | memory     | `${local.memory} MB`                 |
+    | root disk  | `${local.rootfs.size}`               |
+    | dns        | `${join(", ", var.dns_aliases)}`     |
+    | mnt points | `${join(", ", var.mountpoint.*.mp)}` |
+
     ![LXC](https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/linux-containers-lxc.svg)
   EOT
   cores           = local.cores
