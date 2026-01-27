@@ -25,3 +25,9 @@ tasks:
     desc: Reboot Proxmox nodes
     cmds:
       - ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} proxmox-nodes-reboot.yml
+
+  provision-pbs:
+    dir: "{{.ANSIBLE_DIR}}"
+    desc: Provision PBS
+    cmds:
+      - ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} proxmox-pbs-provision.yml
