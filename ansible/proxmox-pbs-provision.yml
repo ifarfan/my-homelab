@@ -1,0 +1,23 @@
+---
+- name: Set PBS hostname
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Set FQDN for PBS + add to PBS group
+      ansible.builtin.add_host:
+        hostname: "mbk.{{ global_domain }}"
+        groups: my_pbs_nodes
+
+- name: PBS server provisioning
+  hosts: my_pbs_nodes
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Proxmox node default configuration
+      ansible.builtin.include_role:
+        name: base_proxmox
+
+    - name: Install modern Unix utilities
+      ansible.builtin.include_role:
+        name: modern_unix
+

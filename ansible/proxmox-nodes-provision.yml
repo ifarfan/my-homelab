@@ -1,12 +1,13 @@
 ---
-- name: Build nodes list
-  ansible.builtin.import_playbook: proxmox-build-group.yml
-
 - name: Proxmox servers provisioning
-  hosts: my_proxmox_nodes
+  hosts: proxmox_nodes
   become: true
   gather_facts: true
   tasks:
     - name: Proxmox node default configuration
       ansible.builtin.include_role:
         name: base_proxmox
+
+    - name: Install modern Unix utilities
+      ansible.builtin.include_role:
+        name: modern_unix

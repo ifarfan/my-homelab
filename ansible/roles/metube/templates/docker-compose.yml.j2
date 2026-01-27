@@ -13,14 +13,15 @@ services:
     ports:
       - "8083:{{ metube_port }}"
     environment:
-      UID: {{ metube_uid}}
-      GID: {{ metube_gid}}
       DOWNLOAD_DIR: /downloads
+      GID: {{ metube_gid}}
+      LOGLEVEL: INFO
+      MAX_CONCURRENT_DOWNLOADS: 2
       STATE_DIR: /config
       TEMP_DIR: /metube-tmp
-      YTDL_OPTIONS: '{"cookiefile":"/cookies/cookies.txt","writesubtitles": "true","subtitlesformat":"srt","extractor_args": {"generic": {"impersonate": [""]}}}'
       TZ: {{ global_tz }}
-      LOGLEVEL: INFO
+      UID: {{ metube_uid}}
+      YTDL_OPTIONS: '{"cookiefile":"/cookies/cookies.txt","writesubtitles": "true","subtitlesformat":"srt","extractor_args": {"generic": {"impersonate": [""]}}}'
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.metube.entrypoints=http"

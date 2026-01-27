@@ -1,9 +1,6 @@
 ---
-- name: Build nodes list
-  ansible.builtin.import_playbook: proxmox-build-group.yml
-
 - name: Update Proxmox servers
-  hosts: my_proxmox_nodes
+  hosts: proxmox_nodes
   become: true
   gather_facts: false
   tasks:
@@ -15,5 +12,5 @@
       throttle: 1
       ansible.builtin.reboot:
         post_reboot_delay: 60
-        reboot_timeout: 180
+        reboot_timeout: 90
         test_command: /usr/bin/systemctl status pvedaemon
