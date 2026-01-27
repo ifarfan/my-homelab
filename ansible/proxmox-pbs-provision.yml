@@ -20,4 +20,3 @@
     - name: Install modern Unix utilities
       ansible.builtin.include_role:
         name: modern_unix
-
