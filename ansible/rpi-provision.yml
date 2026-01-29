@@ -1,18 +1,21 @@
 ---
 - name: Build RPis list with FQDN
-  hosts: all
-  become: true
-  gather_facts: true
+  hosts: localhost
+  gather_facts: false
   tasks:
-    - name: Set FQDN for RPis
-      ansible.builtin.add_host:
-        hostname: "{{ item | split('.') | first }}.{{ global_domain }}"
-        groups: rpi
-      loop: "{{ groups.rpi_local }}"
+    - name: Dynamic host name setup
+      block:
+        - name: Set FQDN for RPis
+          ansible.builtin.add_host:
+            hostname: "{{ item | split('.') | first }}.{{ global_domain }}"
+            groups: rpi
+          loop: "{{ groups.rpi_local }}"
 
-    - name: List FQDN nodes
-      ansible.builtin.debug:
-        msg: "{{ groups.rpi }}"
+        - name: List FQDN rpi nodes
+          ansible.builtin.debug:
+            msg: "{{ groups.rpi }}"
+      tags:
+        - always
 
 # ? Shared RPi provisioning playbook
 - name: RPis provisioning
@@ -31,6 +34,10 @@
     - name: Install modern Unix utilities
       ansible.builtin.include_role:
         name: modern_unix
+
+    - name: Install Restic
+      ansible.builtin.include_role:
+        name: restic
 
     # ? Docker daemon + docker compose apps
     - name: Install Docker
