@@ -34,3 +34,10 @@
         name: dozzle
       vars:
         is_agent: true
+
+    - name: Install Unbound
+      ansible.builtin.include_role:
+        name: unbound
+        apply:
+          tags: unbound
+      tags: unbound

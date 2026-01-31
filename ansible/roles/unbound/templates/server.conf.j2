@@ -1,0 +1,86 @@
+server:
+    verbosity: 1
+
+    # Network settings
+    access-control: 127.0.0.0/8 allow
+    access-control: ::1/128 allow
+    interface: 127.0.0.1
+    interface: ::1
+    port: {{ unbound_port}}
+    do-ip4: yes
+    do-ip6: no
+    do-tcp: yes
+    do-udp: yes
+
+    # Operational settings
+    chroot: ""
+    directory: "{{ unbound_directory }}"
+    pidfile: "{{ unbound_pid_file }}"
+    username: "unbound"
+
+    # Logging
+    # log-queries: no
+    # log-time-ascii: yes
+    # logfile: "/var/log/unbound.log"
+    # val-log-level: 2
+    log-queries: no
+    log-replies: no
+    log-tag-queryreply: no
+    log-local-actions: no
+    logfile: ""
+    use-syslog: yes
+
+    # DNSSEC validation
+    aggressive-nsec: yes
+    auto-trust-anchor-file: "{{ unbound_root_key }}"
+    val-clean-additional: yes
+    val-permissive-mode: no
+    val-log-level: 1
+
+    # Root hints for bootstrapping
+    root-hints: "{{ unbound_root_hints }}"
+
+    # Used for validating TLS connections
+    tls-cert-bundle: "{{ unbound_tls_certs}}"
+
+    # Performance tuning
+    num-threads: {{ unbound_processor_nproc }}
+    msg-cache-slabs: {{ unbound_processor_nproc }}
+    rrset-cache-slabs: {{ unbound_processor_nproc }}
+    infra-cache-slabs: {{ unbound_processor_nproc }}
+    key-cache-slabs: {{ unbound_processor_nproc }}
+
+    # Increase cache sizes for better performance on busy servers
+    msg-cache-size: 128m
+    rrset-cache-size: 256m
+    key-cache-size: 32m
+    neg-cache-size: 16m
+
+    # Socket handling
+    so-rcvbuf: 4m
+    so-sndbuf: 4m
+    so-reuseport: yes
+    outgoing-range: 8192
+    num-queries-per-thread: 4096
+
+    # Privacy + security settings
+    hide-identity: no
+    hide-version: yes
+    harden-glue: yes
+    harden-dnssec-stripped: yes
+    harden-below-nxdomain: yes
+    harden-referral-path: yes
+    harden-algo-downgrade: yes
+    use-caps-for-id: yes
+    qname-minimisation: yes
+    qname-minimisation-strict: no
+
+    # Prefetching for performance
+    prefetch: yes
+    prefetch-key: yes
+    serve-expired: yes
+    serve-expired-ttl: 86400
+    serve-expired-client-timeout: 1800
+
+    # Module configuration - validator must be present for DNSSEC
+    module-config: "validator iterator"
