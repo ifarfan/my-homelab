@@ -63,10 +63,9 @@ tasks:
       - ansible-playbook -i {{.RPI_ANSIBLE_INVENTORY}} {{.RPI_ANSIBLE_PLAYBOOK}}
 
   update-rpis:
-    dir: "{{.ANSIBLE_DIR}}"
-    desc: Update RPis
+    desc: Update RPis (alias to 'provision-rpis' task)
     cmds:
-      - ansible-playbook -i {{.RPI_ANSIBLE_INVENTORY}} {{.RPI_ANSIBLE_PLAYBOOK}}
+      - task: provision-rpis
 
   provision-traefik:
     desc: "Provision 'Traefik' on RPis"
