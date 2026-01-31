@@ -12,7 +12,7 @@
   ansible.builtin.command:
     cmd: /usr/sbin/unbound-anchor -a {{ unbound_root_key | quote }}
     creates: "{{ unbound_root_key }}"
-  ignore_errors: true
+  ignore_errors: true                     # noqa ignore-errors
 
 - name: Copy unbound-anchor systemd files
   ansible.builtin.copy:
