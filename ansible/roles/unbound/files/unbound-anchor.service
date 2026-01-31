@@ -1,0 +1,9 @@
+[Unit]
+Description=Update Unbound root trust anchor
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/unbound-anchor -a /var/lib/unbound/root.key
+User=unbound

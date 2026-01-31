@@ -1,0 +1,18 @@
+---
+- name: restart unbound
+  ansible.builtin.systemd_service:
+    name: unbound.service
+    state: restarted
+    enabled: true
+
+- name: restart unbound-anchor-service
+  ansible.builtin.systemd:
+    name: unbound-anchor.service
+    state: restarted
+    enabled: true
+    daemon_reload: true
+
+- name: enable unbound-anchor-timer
+  ansible.builtin.systemd:
+    name: unbound-anchor.timer
+    enabled: true

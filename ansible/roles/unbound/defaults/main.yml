@@ -1,0 +1,10 @@
+---
+unbound_directory: /etc/unbound
+unbound_conf_directory: "{{ unbound_directory }}/unbound.conf.d"
+unbound_root_key: /var/lib/unbound/root.key
+unbound_pid_file: /var/run/unbound.pid
+unbound_root_hints: /usr/share/dns/root.hints
+unbound_tls_certs: /etc/ssl/certs/ca-certificates.crt
+
+unbound_port: 5353
+unbound_processor_nproc: "{{ ansible_processor_nproc | default(1) }}"

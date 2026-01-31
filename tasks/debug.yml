@@ -52,3 +52,9 @@ tasks:
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.DEBUG_ANSIBLE_PLAYBOOK}}"
+
+  provision-unbound:
+    desc: Provision "Unbound" on '{{.DEBUG_HOST}}'"
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.DEBUG_ANSIBLE_PLAYBOOK}} --tag unbound"

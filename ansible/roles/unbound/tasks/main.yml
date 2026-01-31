@@ -1,0 +1,59 @@
+---
+- name: Install package
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - unbound
+    - unbound-anchor
+    - dns-root-data
+
+- name: Create root file (DNSSEC validation) via unbound-anchor
+  ansible.builtin.command:
+    cmd: /usr/sbin/unbound-anchor -a {{ unbound_root_key | quote }}
+    creates: "{{ unbound_root_key }}"
+
+- name: Copy unbound-anchor systemd files
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  loop:
+    - unbound-anchor.service
+    - unbound-anchor.timer
+  notify:
+    - restart unbound-anchor-service
+    - enable unbound-anchor-timer
+
+- name: List of local "config" files
+  ansible.builtin.shell:
+    cmd: ls -1 "{{ role_path }}/templates/" | sed s/\.j2//
+  delegate_to: localhost
+  become: false
+  changed_when: false
+  register: managed_files
+
+- name: List of remote "config" files
+  ansible.builtin.command:
+    cmd: ls -1 "{{ unbound_conf_directory }}/"
+  register: unmanaged_files
+  changed_when: false
+
+- name: Remove remote "unmanaged" config files but leave "managed" files
+  ansible.builtin.file:
+    path: "{{ unbound_conf_directory }}/{{ item }}"
+    state: absent
+  loop: "{{ unmanaged_files.stdout_lines }}"
+  when: item not in managed_files.stdout_lines
+
+- name: Copy config files
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ unbound_conf_directory }}/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  loop: "{{ managed_files.stdout_lines }}"
+  notify: restart unbound

@@ -1,0 +1,10 @@
+[Unit]
+Description=Monthly Unbound anchor update
+
+[Timer]
+OnCalendar=monthly
+Persistent=true
+RandomizedDelaySec=86400
+
+[Install]
+WantedBy=timers.target

@@ -39,6 +39,10 @@
       ansible.builtin.include_role:
         name: restic
 
+    - name: Install Unbound
+      ansible.builtin.include_role:
+        name: unbound
+
     # ? Docker daemon + docker compose apps
     - name: Install Docker
       ansible.builtin.include_role:
