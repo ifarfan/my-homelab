@@ -72,3 +72,10 @@
       ansible.builtin.include_role:
         name: termix
       tags: termix
+
+    - name: Install Bichon
+      ansible.builtin.include_role:
+        name: bichon
+        apply:
+          tags: bichon
+      tags: bichon

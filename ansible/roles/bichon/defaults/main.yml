@@ -1,0 +1,10 @@
+---
+bichon_directory: /opt/bichon
+bichon_uri: "bichon.{{ global_domain }}"
+bichon_port: 15630
+bichon_user: 1000
+
+bichon_encrypt_password: "{{ lookup('ansible.builtin.ini', 'encrypt_password', section='bichon', file='credentials.ini') }}"
+
+bichon_nfs_mount: /mnt/backups
+bichon_backup_directory: "{{ bichon_nfs_mount }}/bichon"

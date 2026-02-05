@@ -1,0 +1,37 @@
+---
+services:
+  bichon:
+    image: rustmailer/bichon:latest
+    container_name: bichon
+    restart: unless-stopped
+    networks:
+      - traefik_default
+    volumes:
+      - ./data:/data
+      - ./envelope:/envelope
+      - {{ bichon_backup_directory }}:/eml
+    ports:
+      - {{ bichon_port }}:{{ bichon_port }}
+    user: 1000:1000
+    environment:
+      BICHON_ROOT_DIR: /data          # encrypted settings
+      BICHON_INDEX_DIR: /envelope     # metadata
+      BICHON_DATA_DIR: /eml           # email content
+      BICHON_LOG_LEVEL: info
+      BICHON_ENCRYPT_PASSWORD: $BICHON_ENCRYPT_PASSWORD
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bichon.entrypoints=http"
+      - "traefik.http.routers.bichon.rule=Host(`{{ bichon_uri }}`)"
+      - "traefik.http.middlewares.bichon-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.bichon.middlewares=bichon-https-redirect"
+      - "traefik.http.routers.bichon-secure.entrypoints=https"
+      - "traefik.http.routers.bichon-secure.rule=Host(`{{ bichon_uri }}`)"
+      - "traefik.http.routers.bichon-secure.tls=true"
+      - "traefik.http.routers.bichon-secure.service=bichon"
+      - "traefik.http.services.bichon.loadbalancer.server.port={{ bichon_port }}"
+      - "traefik.docker.network=traefik_default"
+
+networks:
+  traefik_default:
+    external: true
