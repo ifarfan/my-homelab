@@ -12,7 +12,7 @@ services:
       - {{ bichon_backup_directory }}:/eml
     ports:
       - {{ bichon_port }}:{{ bichon_port }}
-    user: 1000:1000
+    user: {{ bichon_user }}:{{ bichon_user }}
     environment:
       BICHON_ROOT_DIR: /data          # encrypted settings
       BICHON_INDEX_DIR: /envelope     # metadata
