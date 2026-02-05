@@ -27,6 +27,7 @@ locals {
   # Additional DNS aliases/CNAMEs
   dns_aliases = [
     "atuin",
+    "bichon",
     "dumbpad",
     "it-tools",
     "networking-toolbox",

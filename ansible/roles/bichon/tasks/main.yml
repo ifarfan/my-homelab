@@ -1,0 +1,66 @@
+---
+- name: Install NFS client and mount volumes
+  ansible.builtin.include_role:
+    name: nfs_client
+  vars:
+    nfs_client_mounts:
+      - { volume: backups, path: "{{ bichon_nfs_mount }}", rights: rw }
+
+- name: Create app NFS "data" directory
+  ansible.builtin.file:
+    path: "{{ bichon_backup_directory }}"
+    state: directory
+    mode: 0755
+
+- name: Create app directory
+  ansible.builtin.file:
+    path: "{{ bichon_directory }}"
+    state: directory
+    mode: 0755
+
+- name: Create app sub-directories
+  ansible.builtin.file:
+    path: "{{ bichon_directory }}/{{ item }}"
+    state: directory
+    owner: "{{ bichon_user }}"
+    group: "{{ bichon_user }}"
+    mode: 0755
+  loop:
+    - data
+    - envelope
+
+- name: Copy .ENV file
+  ansible.builtin.template:
+    src: .env.j2
+    dest: "{{ bichon_directory }}/.env"
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Copy docker-compose file
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ bichon_directory }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Create and start app
+  community.docker.docker_compose_v2:
+    project_src: "{{ bichon_directory }}"
+    recreate: always
+    pull: missing
+    remove_orphans: true
+    remove_volumes: true
+    state: restarted
+
+- name: Wait until certificate is registered
+  ansible.builtin.uri:
+    url: "https://{{ bichon_uri }}/"
+    validate_certs: true
+    status_code:
+      - 200
+  register: uri_output
+  until: uri_output.status == 200
+  delay: 10
+  retries: 30       # Retries for 30 * 10 secs = 300 secs = 5 mins
