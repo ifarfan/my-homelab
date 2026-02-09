@@ -1,5 +1,5 @@
 # Fetch values from terraform.tfvars
-variable "proxmox_api_url" {
+variable "proxmox_url" {
   type = string
 }
 
