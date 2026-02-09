@@ -2,7 +2,7 @@ module "my_lxc" {
   source = "../modules/lxc"
 
   # ? Secrets
-  proxmox_api_url      = var.proxmox_api_url
+  proxmox_url          = var.proxmox_url
   proxmox_user         = var.proxmox_user
   proxmox_password     = var.proxmox_password
   cloudflare_api_token = var.cloudflare_api_token
