@@ -1,91 +1,53 @@
 ---
 version: '3'
 
+includes:
+  shared:
+    taskfile: ./__shared.yml
+    internal: true
+
 vars:
-  GRAFIX_VAR: "grafix"
-  GRAFIX_HOST: "{{.GRAFIX_VAR}}.{{.GLOBAL_DOMAIN}}"
-  GRAFIX_TF_DIR: "{{.TERRAFORM_DIR}}/{{.GRAFIX_VAR}}"
-  GRAFIX_TF_STATE: "{{.TERRAFORM_STATE}}/{{.GRAFIX_VAR}}.tfstate"
-  GRAFIX_ANSIBLE_PLAYBOOK: "lxc-{{.GRAFIX_VAR}}-provision.yml"
+  GRAFIX_HOST: "grafix"
+  SERVICE_VAR: "{{.GRAFIX_HOST}}"
 
 tasks:
   check:
-    desc: "Check '{{.GRAFIX_HOST}}' host vars"
+    desc: 'Check "{{.GRAFIX_HOST}}" host vars'
     cmds:
-      - "echo GRAFIX_HOST={{.GRAFIX_HOST}}"
-      - "echo GRAFIX_TF_DIR={{.GRAFIX_TF_DIR}}"
-      - "echo GRAFIX_TF_STATE={{.GRAFIX_TF_STATE}}"
-      - "echo GRAFIX_ANSIBLE_PLAYBOOK={{.GRAFIX_ANSIBLE_PLAYBOOK}}"
+      - task: shared:check-lxc-vars
 
   # ? Terraform
-  terraform-run:
-    internal: true
-    desc: "Create '{{.GRAFIX_HOST}}' host"
-    dir: "{{.GRAFIX_TF_DIR}}"
-    cmds:
-      - terraform init -backend-config="path={{.GRAFIX_TF_STATE}}"
-      - terraform fmt && terraform validate
-      - terraform apply -lock=false
-      - terraform output
-
-  ansible-post-run:
-    internal: true
-    desc: "Patch '{{.GRAFIX_HOST}}' host"
-    dir: "{{.ANSIBLE_DIR}}"
-    cmds:
-      - |
-        ansible-playbook \
-          -i {{.ANSIBLE_INVENTORY_PROXMOX}} \
-          proxmox-lxc-patch.yml \
-          --extra-vars 'lxc_hostname={{.LXC_HOSTNAME}} lxc_id={{.LXC_ID}} lxc_proxmox_node={{.LXC_PROXMOX_NODE}} lxc_patch=gpu'
-    vars:
-      LXC_HOSTNAME:
-        sh: terraform -chdir={{.GRAFIX_TF_DIR}} output -json my_lxc | jq -r '.lxc_hostname'
-      LXC_ID:
-        sh: terraform -chdir={{.GRAFIX_TF_DIR}} output -json my_lxc | jq -r '.lxc_vmid'
-      LXC_PROXMOX_NODE:
-        sh: terraform -chdir={{.GRAFIX_TF_DIR}} output -json my_lxc | jq -r '.lxc_proxmox_node'
-
   create-lxc:
     desc: "Create '{{.GRAFIX_HOST}}' host + patch LXC"
     cmds:
-      - task: terraform-run
-      - task: ansible-post-run
+      - task: shared:create-lxc
+      - task: shared:patch-lxc
+        vars: {PATCH_NAME: 'gnu'}
 
   destroy-lxc:
-    desc: "Destroy '{{.GRAFIX_HOST}}' host"
-    dir: "{{.GRAFIX_TF_DIR}}"
+    desc: 'Destroy "{{.GRAFIX_HOST}}" host'
     cmds:
-      - terraform destroy -lock=false -compact-warnings
+      - task: shared:destroy-lxc
 
   update-dns:
-    desc: "Update DNS records for '{{.GRAFIX_HOST}}' host"
-    dir: "{{.GRAFIX_TF_DIR}}"
+    desc: 'Update DNS records for "{{.GRAFIX_HOST}}" host'
     cmds:
-      - terraform init -backend-config="path={{.GRAFIX_TF_STATE}}"
-      - terraform fmt && terraform validate
-      - |
-        terraform apply     \
-          -lock=false       \
-          -compact-warnings \
-          -parallelism=1    \
-          -target=module.my_lxc.cloudflare_record.cname_records
+      - task: shared:update-dns
 
   # ? Ansible
   provision:
-    desc: "Provision '{{.GRAFIX_HOST}}' via Ansible"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "{{.GRAFIX_HOST}}" via Ansible'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.GRAFIX_ANSIBLE_PLAYBOOK}}"
+      - task: shared:provision
 
   provision-traefik:
-    desc: "Provision 'Traefik' on '{{.GRAFIX_HOST}}'"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "Traefik" on "{{.GRAFIX_HOST}}"'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.GRAFIX_ANSIBLE_PLAYBOOK}} --tag traefik"
+      - task: shared:provision-app
+        vars: {APP_NAME: 'traefik'}
 
   provision-neko:
-    desc: "Provision 'Neko' on '{{.GRAFIX_HOST}}'"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "Neko" on "{{.GRAFIX_HOST}}"'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.GRAFIX_ANSIBLE_PLAYBOOK}} --tag neko"
+      - task: shared:provision-app
+        vars: {APP_NAME: 'neko'}

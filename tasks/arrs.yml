@@ -1,60 +1,63 @@
 ---
 version: '3'
 
+includes:
+  shared:
+    taskfile: ./__shared.yml
+    internal: true
+
 vars:
-  ARRS_VAR: "arrs"
-  ARRS_HOST: "{{.ARRS_VAR}}.{{.GLOBAL_DOMAIN}}"
-  ARRS_TF_DIR: "{{.TERRAFORM_DIR}}/{{.ARRS_VAR}}"
-  ARRS_TF_STATE: "{{.TERRAFORM_STATE}}/{{.ARRS_VAR}}.tfstate"
-  ARRS_ANSIBLE_PLAYBOOK: "lxc-{{.ARRS_VAR}}-provision.yml"
+  ARRS_HOST: "arrs"
+  SERVICE_VAR: "{{.ARRS_HOST}}"
 
 tasks:
   check:
-    desc: "Check '{{.ARRS_HOST}}' host vars"
+    desc: 'Check "{{.ARRS_HOST}}" host vars'
     cmds:
-      - "echo ARRS_HOST={{.ARRS_HOST}}"
-      - "echo ARRS_TF_DIR={{.ARRS_TF_DIR}}"
-      - "echo ARRS_TF_STATE={{.ARRS_TF_STATE}}"
-      - "echo ARRS_ANSIBLE_PLAYBOOK={{.ARRS_ANSIBLE_PLAYBOOK}}"
+      - task: shared:check-lxc-vars
 
   # ? Terraform
   create-lxc:
-    desc: "Create '{{.ARRS_HOST}}' host"
-    dir: "{{.ARRS_TF_DIR}}"
+    desc: 'Create "{{.ARRS_HOST}}" host'
     cmds:
-      - terraform init -backend-config="path={{.ARRS_TF_STATE}}"
-      - terraform fmt && terraform validate
-      - terraform apply -lock=false
-      - terraform output
+      - task: shared:create-lxc
 
   destroy-lxc:
-    desc: "Destroy '{{.ARRS_HOST}}' host"
-    dir: "{{.ARRS_TF_DIR}}"
+    desc: 'Destroy "{{.ARRS_HOST}}" host'
     cmds:
-      - terraform destroy -lock=false -compact-warnings
+      - task: shared:destroy-lxc
 
   update-dns:
-    desc: "Update DNS records for '{{.ARRS_HOST}}' host"
-    dir: "{{.ARRS_TF_DIR}}"
+    desc: 'Update DNS records for "{{.ARRS_HOST}}" host'
     cmds:
-      - terraform init -backend-config="path={{.ARRS_TF_STATE}}"
-      - terraform fmt && terraform validate
-      - |
-        terraform apply     \
-          -lock=false       \
-          -compact-warnings \
-          -parallelism=1    \
-          -target=module.my_lxc.cloudflare_record.cname_records
+      - task: shared:update-dns
 
   # ? Ansible
   provision:
-    desc: "Provision '{{.ARRS_HOST}}' via Ansible"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "{{.ARRS_HOST}}" via Ansible'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.ARRS_ANSIBLE_PLAYBOOK}}"
+      - task: shared:provision
 
   provision-traefik:
-    desc: "Provision 'Traefik' on '{{.ARRS_HOST}}'"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "Traefik" on "{{.ARRS_HOST}}"'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.ARRS_ANSIBLE_PLAYBOOK}} --tag traefik"
+      - task: shared:provision-app
+        vars: {APP_NAME: 'traefik'}
+
+  provision-arr-stack:
+    desc: 'Provision "Arr-Stack" on "{{.ARRS_HOST}}"'
+    cmds:
+      - task: shared:provision-app
+        vars: {APP_NAME: 'arr_stack'}
+
+  provision-metube:
+    desc: 'Provision "MeTube" on "{{.ARRS_HOST}}"'
+    cmds:
+      - task: shared:provision-app
+        vars: {APP_NAME: 'metube'}
+
+  provision-stash:
+    desc: 'Provision "Stash" on "{{.ARRS_HOST}}"'
+    cmds:
+      - task: shared:provision-app
+        vars: {APP_NAME: 'stash'}

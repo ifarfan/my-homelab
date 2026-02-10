@@ -2,32 +2,38 @@
 version: '3'
 
 tasks:
-  list-nodes:
+  ansible-proxmox:
+    internal: true
     dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.P_PLAYBOOK}} {{.P_TAGS:default ""}}
+
+  list-nodes:
     desc: List Proxmox nodes
     cmds:
-      - ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} proxmox-nodes-provision.yml --list-hosts
+      - task: ansible-proxmox
+        vars: {P_PLAYBOOK: 'proxmox-nodes-provision.yml', P_TAGS: '--list-hosts'}
 
   provision-nodes:
-    dir: "{{.ANSIBLE_DIR}}"
     desc: Provision Proxmox nodes
     cmds:
-      - ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} proxmox-nodes-provision.yml
+      - task: ansible-proxmox
+        vars: {P_PLAYBOOK: 'proxmox-nodes-provision.yml'}
 
   update-nodes:
-    dir: "{{.ANSIBLE_DIR}}"
     desc: Update Proxmox nodes
     cmds:
-      - ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} proxmox-nodes-update.yml
+      - task: ansible-proxmox
+        vars: {P_PLAYBOOK: 'proxmox-nodes-update.yml'}
 
   reboot-nodes:
-    dir: "{{.ANSIBLE_DIR}}"
     desc: Reboot Proxmox nodes
     cmds:
-      - ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} proxmox-nodes-reboot.yml
+      - task: ansible-proxmox
+        vars: {P_PLAYBOOK: 'proxmox-nodes-reboot.yml'}
 
   provision-pbs:
-    dir: "{{.ANSIBLE_DIR}}"
     desc: Provision PBS
     cmds:
-      - ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} proxmox-pbs-provision.yml
+      - task: ansible-proxmox
+        vars: {P_PLAYBOOK: 'proxmox-pbs-provision.yml'}

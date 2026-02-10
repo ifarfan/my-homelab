@@ -25,6 +25,9 @@ tasks:
   update-dns:
     desc: "Update DNS records for RPi hosts"
     dir: "{{.RPI_TF_DIR}}"
+    preconditions:
+      - sh: test -f {{.RPI_TF_STATE}}
+        msg: "{{.RPI_TF_STATE}} not found"
     cmds:
       - terraform init -backend-config="path={{.RPI_TF_STATE}}"
       - terraform fmt && terraform validate
@@ -36,31 +39,37 @@ tasks:
           -target=cloudflare_record.cname_records \
           -target=cloudflare_record.dns_record
 
+  ansible-rpi:
+    internal: true
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook -i {{.RPI_ANSIBLE_INVENTORY}} {{.R_PLAYBOOK}} {{.R_TAGS:default ""}}
+
   # ? Ansible (pre-provisioned RPis commands)
   list-rpis-local:
-    dir: "{{.ANSIBLE_DIR}}"
     desc: List RPis local
     cmds:
-      - ansible-playbook -i {{.RPI_ANSIBLE_INVENTORY}} {{.RPI_LOCAL_ANSIBLE_PLAYBOOK}} --list-hosts
+      - task: ansible-rpi
+        vars: {R_PLAYBOOK: {{.RPI_LOCAL_ANSIBLE_PLAYBOOK}}, R_TAGS: '--list-hosts'}
 
   pre-provision-rpis:
-    dir: "{{.ANSIBLE_DIR}}"
     desc: Provision RPis
     cmds:
-      - ansible-playbook -i {{.RPI_ANSIBLE_INVENTORY}} {{.RPI_LOCAL_ANSIBLE_PLAYBOOK}}
+      - task: ansible-rpi
+        vars: {R_PLAYBOOK: {{.RPI_LOCAL_ANSIBLE_PLAYBOOK}}}
 
   # ? Ansible
   list-rpis:
-    dir: "{{.ANSIBLE_DIR}}"
     desc: List RPis
     cmds:
-      - ansible-playbook -i {{.RPI_ANSIBLE_INVENTORY}} {{.RPI_ANSIBLE_PLAYBOOK}} --list-hosts
+      - task: ansible-rpi
+        vars: {R_PLAYBOOK: {{.RPI_ANSIBLE_PLAYBOOK}}, R_TAGS: '--list-hosts'}
 
   provision-rpis:
-    dir: "{{.ANSIBLE_DIR}}"
     desc: Provision RPis
     cmds:
-      - ansible-playbook -i {{.RPI_ANSIBLE_INVENTORY}} {{.RPI_ANSIBLE_PLAYBOOK}}
+      - task: ansible-rpi
+        vars: {R_PLAYBOOK: {{.RPI_ANSIBLE_PLAYBOOK}}}
 
   update-rpis:
     desc: Update RPis (alias to 'provision-rpis' task)
@@ -69,12 +78,12 @@ tasks:
 
   provision-traefik:
     desc: "Provision 'Traefik' on RPis"
-    dir: "{{.ANSIBLE_DIR}}"
     cmds:
-      - ansible-playbook -i {{.RPI_ANSIBLE_INVENTORY}} {{.RPI_ANSIBLE_PLAYBOOK}} --tag traefik
+      - task: ansible-rpi
+        vars: {R_PLAYBOOK: {{.RPI_ANSIBLE_PLAYBOOK}}, R_TAGS: '--tag traefik'}
 
   provision-pulse:
     desc: "Provision 'Pulse' on RPi"
-    dir: "{{.ANSIBLE_DIR}}"
     cmds:
-      - ansible-playbook -i {{.RPI_ANSIBLE_INVENTORY}} {{.RPI_ANSIBLE_PLAYBOOK}} --tag pulse
+      - task: ansible-rpi
+        vars: {R_PLAYBOOK: {{.RPI_ANSIBLE_PLAYBOOK}}, R_TAGS: '--tag pulse'}
