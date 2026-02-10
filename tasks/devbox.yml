@@ -1,66 +1,51 @@
 ---
 version: '3'
 
+includes:
+  shared:
+    taskfile: ./__shared.yml
+    internal: true
+
 vars:
-  DEVBOX_VAR: "devbox"
-  DEVBOX_HOST: "{{.DEVBOX_VAR}}.{{.GLOBAL_DOMAIN}}"
-  DEVBOX_TF_DIR: "{{.TERRAFORM_DIR}}/{{.DEVBOX_VAR}}"
-  DEVBOX_TF_STATE: "{{.TERRAFORM_STATE}}/{{.DEVBOX_VAR}}.tfstate"
-  DEVBOX_ANSIBLE_PLAYBOOK: "lxc-{{.DEVBOX_VAR}}-provision.yml"
+  DEVBOX_HOST: "devbox"
+  SERVICE_VAR: "{{.DEVBOX_HOST}}"
 
 tasks:
   check:
-    desc: "Check '{{.DEVBOX_HOST}}' host vars"
+    desc: 'Check "{{.DEVBOX_HOST}}" host vars'
     cmds:
-      - "echo DEVBOX_HOST={{.DEVBOX_HOST}}"
-      - "echo DEVBOX_TF_DIR={{.DEVBOX_TF_DIR}}"
-      - "echo DEVBOX_TF_STATE={{.DEVBOX_TF_STATE}}"
-      - "echo DEVBOX_ANSIBLE_PLAYBOOK={{.DEVBOX_ANSIBLE_PLAYBOOK}}"
+      - task: shared:check-lxc-vars
 
   # ? Terraform
   create-lxc:
-    desc: "Create '{{.DEVBOX_HOST}}' host"
-    dir: "{{.DEVBOX_TF_DIR}}"
+    desc: 'Create "{{.DEVBOX_HOST}}" host'
     cmds:
-      - terraform init -backend-config="path={{.DEVBOX_TF_STATE}}"
-      - terraform fmt && terraform validate
-      - terraform apply -lock=false
-      - terraform output
+      - task: shared:create-lxc
 
   destroy-lxc:
-    desc: "Destroy '{{.DEVBOX_HOST}}' host"
-    dir: "{{.DEVBOX_TF_DIR}}"
+    desc: 'Destroy "{{.DEVBOX_HOST}}" host'
     cmds:
-      - terraform destroy -lock=false -compact-warnings
+      - task: shared:destroy-lxc
 
   update-dns:
-    desc: "Update DNS records for '{{.DEVBOX_HOST}}' host"
-    dir: "{{.DEVBOX_TF_DIR}}"
+    desc: 'Update DNS records for "{{.DEVBOX_HOST}}" host'
     cmds:
-      - terraform init -backend-config="path={{.DEVBOX_TF_STATE}}"
-      - terraform fmt && terraform validate
-      - |
-        terraform apply     \
-          -lock=false       \
-          -compact-warnings \
-          -parallelism=1    \
-          -target=module.my_lxc.cloudflare_record.cname_records
+      - task: shared:update-dns
 
   # ? Ansible
   provision:
-    desc: "Provision '{{.DEVBOX_HOST}}' via Ansible"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "{{.DEVBOX_HOST}}" via Ansible'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.DEVBOX_ANSIBLE_PLAYBOOK}}"
+      - task: shared:provision
 
   provision-traefik:
-    desc: "Provision 'Traefik' on '{{.DEVBOX_HOST}}'"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "Traefik" on "{{.DEVBOX_HOST}}"'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.DEVBOX_ANSIBLE_PLAYBOOK}} --tag traefik"
+      - task: shared:provision-app
+        vars: {APP_NAME: 'traefik'}
 
   provision-wakapi:
-    desc: "Provision 'Wakapi' on '{{.DEVBOX_HOST}}'"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "Wakapi" on "{{.DEVBOX_HOST}}"'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.DEVBOX_ANSIBLE_PLAYBOOK}} --tag wakapi"
+      - task: shared:provision-app
+        vars: {APP_NAME: 'wakapi'}

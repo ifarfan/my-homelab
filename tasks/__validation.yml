@@ -1,0 +1,39 @@
+---
+version: '3'
+
+tasks:
+  # Pre-flight checks
+  check-terraform:
+    desc: "Validate Terraform is available"
+    internal: true
+    cmds:
+      - terraform version
+    silent: true
+
+  check-ansible:
+    desc: "Validate Ansible is available"
+    internal: true
+    cmds:
+      - ansible --version
+    silent: true
+
+  check-environment:
+    desc: "Validate required environment variables"
+    internal: true
+    cmds:
+      - |
+        if [ -z "$MY_GLOBAL_DOMAIN" ]; then
+          echo "Error: MY_GLOBAL_DOMAIN not set"
+          exit 1
+        fi
+      - |
+        if [ -z "$MY_TERRAFORM_STATE" ]; then
+          echo "Error: MY_TERRAFORM_STATE not set"
+          exit 1
+        fi
+
+  pre-flight:
+    desc: "Run all pre-flight checks"
+    deps: [check-terraform, check-ansible, check-environment]
+    cmds:
+      - echo "✅ All pre-flight checks passed"

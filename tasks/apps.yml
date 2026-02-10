@@ -1,90 +1,75 @@
 ---
 version: '3'
 
+includes:
+  shared:
+    taskfile: ./__shared.yml
+    internal: true
+
 vars:
-  APPS_VAR: "apps"
-  APPS_HOST: "{{.APPS_VAR}}.{{.GLOBAL_DOMAIN}}"
-  APPS_TF_DIR: "{{.TERRAFORM_DIR}}/{{.APPS_VAR}}"
-  APPS_TF_STATE: "{{.TERRAFORM_STATE}}/{{.APPS_VAR}}.tfstate"
-  APPS_ANSIBLE_PLAYBOOK: "lxc-{{.APPS_VAR}}-provision.yml"
+  APPS_HOST: "apps"
+  SERVICE_VAR: "{{.APPS_HOST}}"
 
 tasks:
   check:
-    desc: "Check '{{.APPS_HOST}}' host vars"
+    desc: 'Check "{{.APPS_HOST}}" host vars'
     cmds:
-      - "echo APPS_HOST={{.APPS_HOST}}"
-      - "echo APPS_TF_DIR={{.APPS_TF_DIR}}"
-      - "echo APPS_TF_STATE={{.APPS_TF_STATE}}"
-      - "echo APPS_ANSIBLE_PLAYBOOK={{.APPS_ANSIBLE_PLAYBOOK}}"
+      - task: shared:check-lxc-vars
 
   # ? Terraform
   create-lxc:
-    desc: "Create '{{.APPS_HOST}}' host"
-    dir: "{{.APPS_TF_DIR}}"
+    desc: 'Create "{{.APPS_HOST}}" host'
     cmds:
-      - terraform init -backend-config="path={{.APPS_TF_STATE}}"
-      - terraform fmt && terraform validate
-      - terraform apply -lock=false
-      - terraform output
+      - task: shared:create-lxc
 
   destroy-lxc:
-    desc: "Destroy '{{.APPS_HOST}}' host"
-    dir: "{{.APPS_TF_DIR}}"
+    desc: 'Destroy "{{.APPS_HOST}}" host'
     cmds:
-      - terraform destroy -lock=false -compact-warnings
+      - task: shared:destroy-lxc
 
   update-dns:
-    desc: "Update DNS records for '{{.APPS_HOST}}' host"
-    dir: "{{.APPS_TF_DIR}}"
+    desc: 'Update DNS records for "{{.APPS_HOST}}" host'
     cmds:
-      - terraform init -backend-config="path={{.APPS_TF_STATE}}"
-      - terraform fmt && terraform validate
-      - |
-        terraform apply     \
-          -lock=false       \
-          -compact-warnings \
-          -parallelism=1    \
-          -target=module.my_lxc.cloudflare_record.cname_records
+      - task: shared:update-dns
 
   # ? Ansible
   provision:
-    desc: "Provision '{{.APPS_HOST}}' via Ansible"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "{{.APPS_HOST}}" via Ansible'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.APPS_ANSIBLE_PLAYBOOK}}"
+      - task: shared:provision
 
   provision-traefik:
-    desc: "Provision 'Traefik' on '{{.APPS_HOST}}'"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "Traefik" on "{{.APPS_HOST}}"'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.APPS_ANSIBLE_PLAYBOOK}} --tag traefik"
+      - task: shared:provision-app
+        vars: {APP_NAME: 'traefik'}
 
   provision-booklore:
-    desc: "Provision 'Booklore' on '{{.APPS_LXC_HOST}}'"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "Booklore" on "{{.APPS_HOST}}"'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.APPS_ANSIBLE_PLAYBOOK}} --tag booklore"
+      - task: shared:provision-app
+        vars: {APP_NAME: 'booklore'}
 
   provision-glance:
-    desc: "Provision 'Glance' on '{{.APPS_LXC_HOST}}'"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "Glance" on "{{.APPS_HOST}}"'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.APPS_ANSIBLE_PLAYBOOK}} --tag glance"
+      - task: shared:provision-app
+        vars: {APP_NAME: 'glance'}
 
   provision-homepage:
-    desc: "Provision 'Homepage' on '{{.APPS_LXC_HOST}}'"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "Homepage" on "{{.APPS_HOST}}"'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.APPS_ANSIBLE_PLAYBOOK}} --tag homepage"
+      - task: shared:provision-app
+        vars: {APP_NAME: 'homepage'}
 
   provision-jotty:
-    desc: Provision "Jotty" on '{{.APPS_LXC_HOST}}'"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "Jotty" on "{{.APPS_HOST}}"'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.APPS_ANSIBLE_PLAYBOOK}} --tag jotty"
+      - task: shared:provision-app
+        vars: {APP_NAME: 'jotty'}
 
   provision-mealie:
-    desc: "Provision 'Mealie' on '{{.APPS_LXC_HOST}}'"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "Mealie" on "{{.APPS_HOST}}"'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.APPS_ANSIBLE_PLAYBOOK}} --tag mealie"
+      - task: shared:provision-app
+        vars: {APP_NAME: 'mealie'}

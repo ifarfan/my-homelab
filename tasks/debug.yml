@@ -1,60 +1,45 @@
 ---
 version: '3'
 
+includes:
+  shared:
+    taskfile: ./__shared.yml
+    internal: true
+
 vars:
-  DEBUG_VAR: "debug"
-  DEBUG_HOST: "{{.DEBUG_VAR}}.{{.GLOBAL_DOMAIN}}"
-  DEBUG_TF_DIR: "{{.TERRAFORM_DIR}}/{{.DEBUG_VAR}}"
-  DEBUG_TF_STATE: "{{.TERRAFORM_STATE}}/{{.DEBUG_VAR}}.tfstate"
-  DEBUG_ANSIBLE_PLAYBOOK: "lxc-{{.DEBUG_VAR}}-provision.yml"
+  DEBUG_HOST: "debug"
+  SERVICE_VAR: "{{.DEBUG_HOST}}"
 
 tasks:
   check:
-    desc: "Check '{{.DEBUG_HOST}}' host vars"
+    desc: 'Check "{{.DEBUG_HOST}}" host vars'
     cmds:
-      - "echo DEBUG_HOST={{.DEBUG_HOST}}"
-      - "echo DEBUG_TF_DIR={{.DEBUG_TF_DIR}}"
-      - "echo DEBUG_TF_STATE={{.DEBUG_TF_STATE}}"
-      - "echo DEBUG_ANSIBLE_PLAYBOOK={{.DEBUG_ANSIBLE_PLAYBOOK}}"
+      - task: shared:check-lxc-vars
 
   # ? Terraform
   create-lxc:
-    desc: "Create '{{.DEBUG_HOST}}' host"
-    dir: "{{.DEBUG_TF_DIR}}"
+    desc: 'Create "{{.DEBUG_HOST}}" host'
     cmds:
-      - terraform init -backend-config="path={{.DEBUG_TF_STATE}}"
-      - terraform fmt && terraform validate
-      - terraform apply -lock=false
-      - terraform output
+      - task: shared:create-lxc
 
   destroy-lxc:
-    desc: "Destroy '{{.DEBUG_HOST}}' host"
-    dir: "{{.DEBUG_TF_DIR}}"
+    desc: 'Destroy "{{.DEBUG_HOST}}" host'
     cmds:
-      - terraform destroy -lock=false -compact-warnings
+      - task: shared:destroy-lxc
 
   update-dns:
-    desc: "Update DNS records for '{{.DEBUG_HOST}}' host"
-    dir: "{{.DEBUG_TF_DIR}}"
+    desc: 'Update DNS records for "{{.DEBUG_HOST}}" host'
     cmds:
-      - terraform init -backend-config="path={{.DEBUG_TF_STATE}}"
-      - terraform fmt && terraform validate
-      - |
-        terraform apply     \
-          -lock=false       \
-          -compact-warnings \
-          -parallelism=1    \
-          -target=module.my_lxc.cloudflare_record.cname_records
+      - task: shared:update-dns
 
   # ? Ansible
   provision:
-    desc: "Provision '{{.DEBUG_HOST}}' via Ansible"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "{{.DEBUG_HOST}}" via Ansible'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.DEBUG_ANSIBLE_PLAYBOOK}}"
+      - task: shared:provision
 
   provision-unbound:
-    desc: Provision "Unbound" on '{{.DEBUG_HOST}}'"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "Unbound" on "{{.DEBUG_HOST}}"'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.DEBUG_ANSIBLE_PLAYBOOK}} --tag unbound"
+      - task: shared:provision-app
+        vars: {APP_NAME: 'unbound'}

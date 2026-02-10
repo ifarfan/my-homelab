@@ -1,102 +1,87 @@
 ---
 version: '3'
 
+includes:
+  shared:
+    taskfile: ./__shared.yml
+    internal: true
+
 vars:
-  TOOLS_VAR: "tools"
-  TOOLS_HOST: "{{.TOOLS_VAR}}.{{.GLOBAL_DOMAIN}}"
-  TOOLS_TF_DIR: "{{.TERRAFORM_DIR}}/{{.TOOLS_VAR}}"
-  TOOLS_TF_STATE: "{{.TERRAFORM_STATE}}/{{.TOOLS_VAR}}.tfstate"
-  TOOLS_ANSIBLE_PLAYBOOK: "lxc-{{.TOOLS_VAR}}-provision.yml"
+  TOOLS_HOST: "tools"
+  SERVICE_VAR: "{{.TOOLS_HOST}}"
 
 tasks:
   check:
-    desc: "Check '{{.TOOLS_HOST}}' host vars"
+    desc: 'Check "{{.TOOLS_HOST}}" host vars'
     cmds:
-      - "echo TOOLS_HOST={{.TOOLS_HOST}}"
-      - "echo TOOLS_TF_DIR={{.TOOLS_TF_DIR}}"
-      - "echo TOOLS_TF_STATE={{.TOOLS_TF_STATE}}"
-      - "echo TOOLS_ANSIBLE_PLAYBOOK={{.TOOLS_ANSIBLE_PLAYBOOK}}"
+      - task: shared:check-lxc-vars
 
   # ? Terraform
   create-lxc:
-    desc: "Create '{{.TOOLS_HOST}}' host"
-    dir: "{{.TOOLS_TF_DIR}}"
+    desc: 'Create "{{.TOOLS_HOST}}" host'
     cmds:
-      - terraform init -backend-config="path={{.TOOLS_TF_STATE}}"
-      - terraform fmt && terraform validate
-      - terraform apply -lock=false
-      - terraform output
+      - task: shared:create-lxc
 
   destroy-lxc:
-    desc: "Destroy '{{.TOOLS_HOST}}' host"
-    dir: "{{.TOOLS_TF_DIR}}"
+    desc: 'Destroy "{{.TOOLS_HOST}}" host'
     cmds:
-      - terraform destroy -lock=false -compact-warnings
+      - task: shared:destroy-lxc
 
   update-dns:
-    desc: "Update DNS records for '{{.TOOLS_HOST}}' host"
-    dir: "{{.TOOLS_TF_DIR}}"
+    desc: 'Update DNS records for "{{.TOOLS_HOST}}" host'
     cmds:
-      - terraform init -backend-config="path={{.TOOLS_TF_STATE}}"
-      - terraform fmt && terraform validate
-      - |
-        terraform apply     \
-          -lock=false       \
-          -compact-warnings \
-          -parallelism=1    \
-          -target=module.my_lxc.cloudflare_record.cname_records
+      - task: shared:update-dns
 
   # ? Ansible
   provision:
-    desc: "Provision '{{.TOOLS_HOST}}' via Ansible"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "{{.TOOLS_HOST}}" via Ansible'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.TOOLS_ANSIBLE_PLAYBOOK}}"
+      - task: shared:provision
 
   provision-traefik:
-    desc: "Provision 'Traefik' on '{{.TOOLS_HOST}}'"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "Traefik" on "{{.TOOLS_HOST}}"'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.TOOLS_ANSIBLE_PLAYBOOK}} --tag traefik"
+      - task: shared:provision-app
+        vars: {APP_NAME: 'traefik'}
 
   provision-atuin:
-    desc: "Provision 'Atuin' on '{{.TOOLS_HOST}}'"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "Atuin" on "{{.TOOLS_HOST}}"'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.TOOLS_ANSIBLE_PLAYBOOK}} --tag atuin"
+      - task: shared:provision-app
+        vars: {APP_NAME: 'atuin'}
 
   provision-dumbpad:
-    desc: "Provision 'DumbPad' on '{{.TOOLS_HOST}}'"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "DumbPad" on "{{.TOOLS_HOST}}"'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.TOOLS_ANSIBLE_PLAYBOOK}} --tag dumbpad"
+      - task: shared:provision-app
+        vars: {APP_NAME: 'dumbpad'}
 
   provision-it-tools:
-    desc: "Provision 'IT-Tools' on '{{.TOOLS_HOST}}'"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "IT-Tools" on "{{.TOOLS_HOST}}"'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.TOOLS_ANSIBLE_PLAYBOOK}} --tag it_tools"
+      - task: shared:provision-app
+        vars: {APP_NAME: 'it_tools'}
 
   provision-networking-toolbox:
-    desc: "Provision 'Networking-Toolbox' on '{{.TOOLS_HOST}}'"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "Networking-Toolbox" on "{{.TOOLS_HOST}}"'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.TOOLS_ANSIBLE_PLAYBOOK}} --tag networking_toolbox"
+      - task: shared:provision-app
+        vars: {APP_NAME: 'networking_toolbox'}
 
   provision-speedtest-tracker:
-    desc: Provision "Speedtest Tracker" on '{{.TOOLS_HOST}}'"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "Speedtest Tracker" on "{{.TOOLS_HOST}}"'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.TOOLS_ANSIBLE_PLAYBOOK}} --tag speedtest_tracker"
+      - task: shared:provision-app
+        vars: {APP_NAME: 'speedtest_tracker'}
 
   provision-termix:
-    desc: "Provision 'Termix' on '{{.TOOLS_HOST}}'"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "Termix" on "{{.TOOLS_HOST}}"'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.TOOLS_ANSIBLE_PLAYBOOK}} --tag termix"
+      - task: shared:provision-app
+        vars: {APP_NAME: 'termix'}
 
   provision-bichon:
-    desc: "Provision 'Bichon' on '{{.TOOLS_HOST}}'"
-    dir: "{{.ANSIBLE_DIR}}"
+    desc: 'Provision "Bichon" on "{{.TOOLS_HOST}}"'
     cmds:
-      - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.TOOLS_ANSIBLE_PLAYBOOK}} --tag bichon"
+      - task: shared:provision-app
+        vars: {APP_NAME: 'bichon'}
