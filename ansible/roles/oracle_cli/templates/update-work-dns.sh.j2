@@ -1,0 +1,36 @@
+#/bin/env bash
+#
+# Script to update work/travel IP in Cloudflare so that
+# I can work on cloud box while away from home
+
+ZONE={{ cloudflare_zone }}
+DNS_RECORD=work.{{ cloudflare_zone }}
+CF_API_KEY={{ cloudflare_api_token }}
+
+LOCATION_IP=$(curl --silent ipecho.net/plain)
+
+# Get Zone ID for domain
+ZONE_ID=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=${ZONE}&status=active" \
+            -H "Authorization: Bearer ${CF_API_KEY}" \
+            -H "Content-Type: application/json" | jq -r '{"result"}[] | .[0] | .id')
+
+# Get Record ID for DNS Record
+DNS_RECORD_ID=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/dns_records?type=A&name=${DNS_RECORD}" \
+            -H "Authorization: Bearer ${CF_API_KEY}" \
+            -H "Content-Type: application/json" | jq -r '{"result"}[] | .[0] | .id')
+
+echo "[Updating CF DNS Record]"
+echo " - ZONE          : ${ZONE}"
+echo " - ZONE_ID       : ${ZONE_ID}"
+echo
+echo " - DNS_RECORD    : ${DNS_RECORD}"
+echo " - DNS_RECORD_ID : ${DNS_RECORD_ID}"
+echo
+echo " - LOCATION_IP   : ${LOCATION_IP}"
+echo " - CURL OUTPUT   :"
+
+# Update "work" DNS Record
+curl -s -X PUT "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/dns_records/${DNS_RECORD_ID}" \
+        -H "Authorization: Bearer ${CF_API_KEY}" \
+        -H "Content-Type: application/json" \
+        --data "{\"type\":\"A\",\"name\":\"${DNS_RECORD}\",\"content\":\"${LOCATION_IP}\",\"ttl\":1,\"proxied\":false}" | jq

@@ -1,0 +1,77 @@
+---
+# See:
+# - https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm#InstallingCLI__linux_and_unix
+- name: Install OCI CLI       # noqa: command-instead-of-module
+  ansible.builtin.shell: |
+    set -o pipefail
+    curl -sL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh | bash -s -- --accept-all-defaults
+  args:
+    executable: /bin/bash
+    creates: /root/bin/oci
+
+- name: Fetch secrets from Doppler
+  become: false
+  delegate_to: localhost
+  block:
+
+    - name: Check that we're logged into Doppler
+      ansible.builtin.command:
+        doppler me
+      register: doppler_me
+      changed_when: false
+
+    - name: Halt if not logged into Doppler
+      ansible.builtin.fail:
+        msg: "Not logged into Doppler. Please run 'doppler login' and try again."
+      when: doppler_me.rc != 0
+
+    - name: Fetch RC file off Doppler
+      ansible.builtin.command:
+        doppler secrets get "{{ doppler_file_rc }}" --plain --project "{{ doppler_project }}" --config "{{ doppler_env }}"
+      register: oci_cli_rc
+      changed_when: false
+
+    - name: Fetch config file off Doppler
+      ansible.builtin.command:
+        doppler secrets get "{{ doppler_file_config }}" --plain --project "{{ doppler_project }}" --config "{{ doppler_env }}"
+      register: oci_cli_config
+      changed_when: false
+
+    - name: Fetch PEM file off Doppler
+      ansible.builtin.command:
+        doppler secrets get "{{ doppler_file_pem }}" --plain --project "{{ doppler_project }}" --config "{{ doppler_env }}"
+      register: oci_cli_pem
+      changed_when: false
+
+- name: Create CLI directory
+  ansible.builtin.file:
+    path: "{{ oracle_cli_home }}"
+    state: directory
+    mode: 0755
+
+- name: Configure CLI RC file
+  ansible.builtin.copy:
+    dest: "{{ oracle_cli_home }}/oci_cli_rc"
+    content: |
+      {{ oci_cli_rc.stdout }}
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Configure CLI config
+  ansible.builtin.copy:
+    dest: "{{ oracle_cli_home }}/config"
+    content: |
+      {{ oci_cli_config.stdout }}
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Configure CLI PEM
+  ansible.builtin.copy:
+    dest: "{{ oracle_cli_home }}/my.pem"
+    content: |
+      {{ oci_cli_pem.stdout }}
+    owner: root
+    group: root
+    mode: 0600

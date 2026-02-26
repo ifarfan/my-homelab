@@ -21,3 +21,4 @@ Documenting my `homelab` journey using a `Proxmox` cluster running, primarily, L
 1. [Terraform](docs/terraform.md) for launching LXCs & VMs
 1. [Ansible](docs/ansible.md) for configuring LXCs & VMs and miscellaneous orchestration tasks
 1. [Packer](docs/packer.md) for creating VM templates
+1. [Oracle Cloud](docs/oracle.md) for running a remote VM for external tasks/workflows

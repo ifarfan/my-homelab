@@ -1,0 +1,26 @@
+---
+version: '3'
+
+vars:
+  ORACLE_VAR: "oracle"
+  ORACLE_ANSIBLE_INVENTORY: "inventories/{{.ORACLE_VAR}}"
+  ORACLE_ANSIBLE_PLAYBOOK: "{{.ORACLE_VAR}}-provision.yml"
+
+tasks:
+  ansible-oracle:
+    internal: true
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook -i {{.ORACLE_ANSIBLE_INVENTORY}} {{.ORACLE_ANSIBLE_PLAYBOOK}} {{O_TAGS:default ""}}
+
+  list-nodes:
+    desc: List Oracle node(s)
+    cmds:
+      - task: ansible-oracle
+        vars: {O_TAGS: '--list-hosts'}
+
+  provision:
+    dir: "{{.ANSIBLE_DIR}}"
+    desc: Provision Oracle node(s)
+    cmds:
+      - task: ansible-oracle

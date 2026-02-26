@@ -1,0 +1,11 @@
+---
+oracle_cli_home: /root/.oci/
+
+doppler_project: oracle
+doppler_env: prd
+doppler_file_rc: OCI_CLI_RC
+doppler_file_config: CLOUDYBOX_CONFIG
+doppler_file_pem: CLOUDYBOX_MY_PEM
+
+cloudflare_api_token: "{{ lookup('ansible.builtin.ini', 'api_token', section='cloudflare-ddns', file='credentials.ini') }}"
+cloudflare_zone: "{{ lookup('ansible.builtin.ini', 'zone', section='cloudflare-ddns', file='credentials.ini') }}"

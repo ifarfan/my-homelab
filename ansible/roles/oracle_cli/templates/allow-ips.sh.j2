@@ -1,0 +1,169 @@
+#/bin/env bash
+#
+# Script to allow home/work/travel IP in Oracle Cloud Infrastructure
+# Updates both "Security List" rules and "Network Security Group" rules using OCI CLI
+
+# 101 on working with OCI CLI:
+# - https://dev.to/farisdurrani/advanced-oci-cli-syntax-and-commands-4hpp
+
+# To generate the JSON input template:
+# - https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions
+
+# See current SecurityList rules:
+# - oci network vcn get --vcn-id "${VCN_ID}" --query 'data."default-security-list-id"' --raw-output
+# - oci network security-list list --vcn-id "${VCN_ID}"
+# - oci network security-list get --security-list-id ${SEC_LIST_ID}
+# - oci network security-list update --security-list-id ${SEC_LIST_ID} --ingress-security-rules --generate-full-command-json-input
+#
+
+# Create temporary files
+STDOUT_FILE=$(mktemp)
+STDERR_FILE=$(mktemp)
+
+# Get current IPs
+WORK_IP=$(dig +short work.{{ cloudflare_zone }})
+HOME_IP=$(dig +short home.{{ cloudflare_zone }})
+
+# Timestamp
+TODAY=$(date "+%F %T")
+
+# Virtual Cloud Network values
+VCN_ID=$(oci network vcn list --query 'data[0].id' --raw-output)
+VCN_NAME=$(oci network vcn list --query 'data[0]."display-name"' --raw-output)
+
+
+# ? Update Security List(s)
+# See
+# - https://docs.oracle.com/en-us/iaas/tools/oci-cli/3.71.0/oci_cli_docs/cmdref/network/security-list/update.html
+# - https://docs.oracle.com/en-us/iaas/api/#/en/iaas/20160918/datatypes/IngressSecurityRule
+#
+SEC_LIST_ID=$(oci network vcn get \
+    --vcn-id "${VCN_ID}" \
+    --query 'data."default-security-list-id"' \
+    --raw-output)
+
+INPUT_FILE=security-list-rules-ingress-template.json
+OUTPUT_FILE=security-list-rules-ingress.json
+
+# Reset + rewrite JSON file
+[ -f "${OUTPUT_FILE}" ] && cat /dev/null > "${OUTPUT_FILE}" || touch "${OUTPUT_FILE}"
+cp "${INPUT_FILE}" "${OUTPUT_FILE}"
+
+sed -i "s/__HOME_IP__/${HOME_IP}/g" "${OUTPUT_FILE}"
+sed -i "s/__WORK_IP__/${WORK_IP}/g" "${OUTPUT_FILE}"
+sed -i "s/__VCN_NAME__/${VCN_NAME}/g" "${OUTPUT_FILE}"
+sed -i "s/__SEC_LIST_ID__/${SEC_LIST_ID}/g" "${OUTPUT_FILE}"
+
+echo "[Updating Security List Ingress Rules]"
+echo " - HOME_IP       : ${HOME_IP}"
+echo " - WORK_IP       : ${WORK_IP}"
+echo " - TODAY         : ${TODAY}"
+echo
+echo " - VCN_ID        : ${VCN_ID}"
+echo " - VCN_NAME      : ${VCN_NAME}"
+echo " - SEC_LIST_ID   : ${SEC_LIST_ID}"
+echo
+echo " - INPUT_FILE    : ${INPUT_FILE}"
+echo " - OUTPUT_FILE   : ${OUTPUT_FILE}"
+echo " - OUTPUT_FILE CONTENTS :"
+cat "${OUTPUT_FILE}" | jq
+echo
+
+# Update Security List rules with new JSON file
+oci network security-list update \
+    --security-list-id ${SEC_LIST_ID} \
+    --ingress-security-rules file://${OUTPUT_FILE} \
+    --force > "${STDOUT_FILE}" 2> "${STDERR_FILE}"
+RESULT=$?
+
+echo "EXECUTION RESULT: ${RESULT}"
+sleep 3
+
+if [ ${RESULT} -eq 0 ]; then
+    echo " - SUCCESS:"
+    cat "${STDOUT_FILE}" | jq
+else
+    echo " - STDERR:"
+    cat "${STDERR_FILE}"
+
+    echo " - STDOUT :"
+    cat "${STDOUT_FILE}"
+fi
+
+echo
+rm "${OUTPUT_FILE}"
+
+
+# ? Update Network Security Group(s) rules
+# See
+# - https://docs.oracle.com/en-us/iaas/tools/oci-cli/3.71.0/oci_cli_docs/cmdref/network/nsg/rules/update.html
+# - https://docs.oracle.com/en-us/iaas/api/#/en/iaas/20160918/datatypes/UpdateSecurityRuleDetails
+#
+# See current NSG rules:
+# - oci network nsg get --nsg-id ${NSG_ID}
+# - oci network nsg rules list --nsg-id ${NSG_ID}
+# - oci network nsg list --query 'data[?contains("display-name", `home`)].id | [0]' --raw-output
+# - oci network nsg list --query 'data[?contains("display-name", `work`)].id | [0]' --raw-output
+#
+# Generate JSON input template with:
+# - oci network nsg rules update --nsg-id ${NSG_ID} --generate-full-command-json-input
+#
+for LOCATION_NAME in "work" "home"; do
+    # Figure out which IP to update
+    [ "${LOCATION_NAME}" == "home" ] && LOCATION_IP=${HOME_IP} || LOCATION_IP=${WORK_IP}
+
+    # Get IDs for this location
+    NSG_ID=$(oci network nsg list --query "data[?contains(\"display-name\", \`${LOCATION_NAME}\`)].id | [0]" --raw-output)
+    NSG_RULE_ID=$(oci network nsg rules list --nsg-id ${NSG_ID} --query 'data[0].id' --raw-output)
+    INPUT_FILE=nsg-rules-template.json
+    OUTPUT_FILE=nsg-rules.json
+
+    # Reset + rewrite JSON file
+    [ -f "${OUTPUT_FILE}" ] && cat /dev/null > "${OUTPUT_FILE}" || touch "${OUTPUT_FILE}"
+    cp "${INPUT_FILE}" "${OUTPUT_FILE}"
+
+    sed -i "s/__TODAY__/${TODAY}/g" "${OUTPUT_FILE}"
+    sed -i "s/__LOCATION_NAME__/${LOCATION_NAME}/g" "${OUTPUT_FILE}"
+    sed -i "s/__LOCATION_IP__/${LOCATION_IP}/g" "${OUTPUT_FILE}"
+    sed -i "s/__NSG_ID__/${NSG_ID}/g" "${OUTPUT_FILE}"
+    sed -i "s/__NSG_RULE_ID__/${NSG_RULE_ID}/g" "${OUTPUT_FILE}"
+
+    echo "[Updating NSG Rule]"
+    echo " - TODAY        : ${TODAY}"
+    echo " - LOCATION_NAME: ${LOCATION_NAME}"
+    echo " - LOCATION_IP  : ${LOCATION_IP}"
+    echo
+    echo " - NSG_ID       : ${NSG_ID}"
+    echo " - NSG_RULE_ID  : ${NSG_RULE_ID}"
+    echo
+    echo " - INPUT_FILE   : ${INPUT_FILE}"
+    echo " - OUTPUT_FILE  : ${OUTPUT_FILE}"
+    echo " - OUTPUT_FILE CONTENTS :"
+    cat "${OUTPUT_FILE}" | jq
+    echo
+
+    # Update NSG rules with new JSON file
+    oci network nsg rules update \
+        --nsg-id ${NSG_ID} \
+        --security-rules file://${OUTPUT_FILE} \
+        > "${STDOUT_FILE}" 2> "${STDERR_FILE}"
+    RESULT=$?
+
+    echo "EXECUTION RESULT: ${RESULT}"
+    sleep 3
+
+    if [ ${RESULT} -eq 0 ]; then
+        echo " - SUCCESS:"
+        cat "${STDOUT_FILE}" | jq
+    else
+        echo " - STDERR:"
+        cat "${STDERR_FILE}"
+
+        echo " - STDOUT :"
+        cat "${STDOUT_FILE}"
+    fi
+    echo
+done
+
+# Cleanup temporary files
+rm "${STDOUT_FILE}" "${STDERR_FILE}" "${OUTPUT_FILE}"
