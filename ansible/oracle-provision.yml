@@ -1,0 +1,54 @@
+---
+- name: Build Oracle list with FQDN
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Dynamic host name setup
+      block:
+        - name: Set FQDN for Oracle node(s)
+          ansible.builtin.add_host:
+            hostname: "cloudy-box.{{ global_domain }}"
+            groups: all
+
+        - name: List FQDN oracle node(s)
+          ansible.builtin.debug:
+            msg: "{{ groups.all }}"
+      tags:
+        - always
+
+# ? Oracle provisioning playbook
+- name: Oracle provisioning
+  hosts: all
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Install Oracle CLI
+      ansible.builtin.include_role:
+        name: oracle_cli
+
+    - name: Install modern Unix utilities
+      ansible.builtin.include_role:
+        name: modern_unix
+
+    # ? Docker daemon + docker compose apps
+    - name: Install Docker
+      ansible.builtin.include_role:
+        name: docker
+
+    - name: Install docker_proxy
+      ansible.builtin.include_role:
+        name: docker_proxy
+
+    - name: Install dozzle
+      ansible.builtin.include_role:
+        name: dozzle
+      vars:
+        is_agent: true
+
+    # ? Docker apps
+    - name: Install Traefik
+      ansible.builtin.include_role:
+        name: traefik
+      vars:
+        hostname_in_uri: true
+      tags: traefik

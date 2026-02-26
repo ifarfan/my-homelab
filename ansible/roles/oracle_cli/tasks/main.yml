@@ -1,0 +1,6 @@
+---
+- name: Configure CLI
+  ansible.builtin.import_tasks: cli_config.yml
+
+- name: Allow IPs into Firewall
+  ansible.builtin.import_tasks: allow-ips.yml

@@ -1,0 +1,16 @@
+[
+  {
+    "description": "My '__LOCATION_NAME__' IP: __TODAY__",
+    "destination": null,
+    "destinationType": null,
+    "direction": "INGRESS",
+    "icmpOptions": null,
+    "id": "__NSG_RULE_ID__",
+    "isStateless": false,
+    "protocol": "all",
+    "source": "__LOCATION_IP__/32",
+    "sourceType": "CIDR_BLOCK",
+    "tcpOptions": null,
+    "udpOptions": null
+  }
+]

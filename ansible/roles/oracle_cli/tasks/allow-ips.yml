@@ -1,0 +1,54 @@
+---
+- name: Create scripts directory
+  ansible.builtin.file:
+    path: "{{ oracle_cli_home }}/scripts"
+    state: directory
+    mode: 0755
+
+- name: Copy main script
+  ansible.builtin.template:
+    src: allow-ips.sh.j2
+    dest: "{{ oracle_cli_home }}/scripts/allow-ips.sh"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: List of local files
+  ansible.builtin.command:
+    ls -1 "{{ role_path }}/files/"
+  delegate_to: localhost
+  become: false
+  changed_when: false
+  register: managed_files
+
+- name: List of remote files
+  ansible.builtin.command:
+    ls -1 "{{ oracle_cli_home }}/scripts"
+  register: unmanaged_files
+  changed_when: false
+
+- name: Remove remote "unmanaged" files but leave "managed" files
+  ansible.builtin.file:
+    path: "{{ oracle_cli_home }}/scripts/{{ item }}"
+    state: absent
+  loop: "{{ unmanaged_files.stdout_lines }}"
+  when: item not in managed_files.stdout_lines
+
+- name: Copy app "config" files
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ oracle_cli_home }}/scripts/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  loop: "{{ managed_files.stdout_lines }}"
+
+- name: Create hourly cron job to allow IPs
+  ansible.builtin.cron:
+    name: allow IPs on Firewall
+    weekday: "*"
+    minute: "3"
+    hour: "*"
+    user: root
+    job: "{{ oracle_cli_home }}/scripts/allow-ips.sh >> /var/log/allow-ips.log 2>&1"
+    cron_file: oracle_cli_allow_ips
