@@ -11,4 +11,5 @@ warn_list:
   - yaml[line-length]
 
 exclude_paths:
+  - roles/base_24/molecule/tests
   - roles/modern_unix/molecule/tests
