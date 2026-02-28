@@ -38,6 +38,7 @@ terraform.rc
 
 #  Ansible
 ansible/*.ini
+packer/ansible/playbooks/*.ini
 
 #  Packer
 packer/logs/*
