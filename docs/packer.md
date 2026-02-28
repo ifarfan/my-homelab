@@ -32,11 +32,11 @@ Parameters:
   Available node(s): m0 m1 m2
 
 --template|-t <TEMPLATE>:
-  Available templates(s): ubuntu-22-04
+  Available templates(s): ubuntu-24-04
 ```
 
 
-Build **Ubuntu 22.04** Proxmox template on `m1` node:
+Build **Ubuntu 24.04** Proxmox template on `m1` node:
 ```shell
-./build.sh -n m1 -t ubuntu-22-04
+./build.sh -n m1 -t ubuntu-24-04
 ```
