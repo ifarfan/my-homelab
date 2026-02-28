@@ -1,17 +1,5 @@
 ---
 file:
-  /etc/profile.d/10-aliases.sh:
-    exists: true
-    filetype: file
-    owner: root
-    group: root
-    mode: "0644"
-  /root/.gitconfig:
-    exists: true
-    filetype: file
-    owner: root
-    group: root
-    mode: "0644"
   /usr/local/bin/procs:
     exists: true
     filetype: file
@@ -32,7 +20,7 @@ package:
     installed: true
   jq:
     installed: true
-  lsd-musl:
+  lsd:
     installed: true
   ripgrep:
     installed: true

@@ -1,0 +1,36 @@
+---
+- name: Download latest ISOs to shared NFS mount
+  hosts: m0
+  become: true
+  gather_facts: false
+  vars:
+    os_image_folder: /mnt/pve/ds1-nfs/template/iso
+    os_image_list:
+      -
+        codename: ubuntu_noble_numbat
+        version: 24.04
+        iso: ubuntu-24.04.3-live-server-amd64.iso
+        url: https://mirror.us.leaseweb.net/ubuntu-releases/24.04.3/ubuntu-24.04.3-live-server-amd64.iso
+        checksum: sha256:c3514bf0056180d09376462a7a1b4f213c1d6e8ea67fae5c25099c6fd3d8274b
+      -
+        codename: talos
+        version: 1.9.5
+        iso: talos-amd64.iso
+        url: https://github.com/siderolabs/talos/releases/download/v1.9.5/metal-amd64.iso
+        checksum: sha256:b85af09aeef9b510648f14280fdb4e1ecd676e462e39f1c0f56388a0cf34fc5a
+  tasks:
+    - name: Create OS images root directory
+      ansible.builtin.file:
+        path: "{{ os_image_folder }}"
+        state: directory
+        mode: 0755
+      run_once: true
+
+    - name: Download ISO images
+      ansible.builtin.get_url:
+        url: "{{ item.url }}"
+        dest: "{{ os_image_folder }}/{{ item.iso }}"
+        checksum: "{{ item.checksum }}"
+        mode: 0600
+      loop: "{{ os_image_list }}"
+      run_once: true
