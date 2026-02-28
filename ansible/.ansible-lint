@@ -12,4 +12,5 @@ warn_list:
 
 exclude_paths:
   - roles/base_24/molecule/tests
+  - roles/goss/molecule/tests
   - roles/modern_unix/molecule/tests
