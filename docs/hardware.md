@@ -16,10 +16,10 @@ m0:
   IP-2:   192.168.136.50 (vmbr1: thunderbold ethernet / used for ceph-ONLY)
 
 m1:
-  Model:  Macmini6,2
-  Memory: 16GB
-  CPU:    8 logical / 4 CPUs x Intel(R) Core(TM) i7-3615QM CPU @ 2.30GHz
-  Disk:   250GB SSD
+  Model:  Macmini8,1
+  Memory: 64GB
+  CPU:    12 logical / 6 CPUs x Intel(R) Core(TM) i7-8700B CPU @ 3.2GHz
+  Disk:   512GB SSD
   IP-1:   192.168.136.11 (vmbr0: native ethernet / used for VMs + LXCs)
   IP-2:   192.168.136.51 (vmbr1: thunderbold ethernet / used for ceph-ONLY)
 
@@ -30,6 +30,14 @@ m2:
   Disk:   250GB SSD
   IP-1:   192.168.136.12 (vmbr0: native ethernet / used for VMs + LXCs)
   IP-2:   192.168.136.52 (vmbr1: thunderbold ethernet / used for ceph-ONLY)
+
+m3:
+  Model:  Macmini6,2
+  Memory: 16GB
+  CPU:    8 logical / 4 CPUs x Intel(R) Core(TM) i7-3615QM CPU @ 2.30GHz
+  Disk:   250GB SSD
+  IP-1:   192.168.136.13 (vmbr0: native ethernet / used for VMs + LXCs)
+  IP-2:   192.168.136.53 (vmbr1: thunderbold ethernet / used for ceph-ONLY)
 
 # Proxmox Backup Server
 mbk:
