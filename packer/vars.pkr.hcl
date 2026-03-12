@@ -93,8 +93,7 @@ locals {
   # Store Template locally on each node
   disks = {
     storage_pool = "local-lvm"
-    # storage_pool_type = "lvm"
-    type = "scsi"
+    type         = "scsi"
   }
 
   network = {

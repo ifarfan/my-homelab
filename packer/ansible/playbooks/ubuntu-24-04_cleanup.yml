@@ -3,8 +3,8 @@
 # ? Ubuntu VM cleanup + reset
 #
 # ! NOTE:
-# not installing cloud-init pkg, thus cleaning up files manually
-# - cloud-init clean --logs --machine-id
+#   not installing cloud-init pkg, thus cleaning up files manually
+#   - cloud-init clean --logs --machine-id
 #
 - name: Cleanup and reset Ubuntu 24.04 VM template
   hosts: default

@@ -49,6 +49,9 @@ packer/manifests/*
 # Magic, autoloading variable files
 *.auto.pkrvars.hcl
 
+# Task files
+tasks/testvm.yml
+
 # Editors
 .vscode/
 .idea/

@@ -45,7 +45,6 @@ source "proxmox-iso" "ubuntu-kickstart" {
     disk_size    = var.vm_disksize
     storage_pool = local.disks.storage_pool
     type         = local.disks.type
-    # storage_pool_type = local.disks.storage_pool_type
   }
 
   network_adapters {
