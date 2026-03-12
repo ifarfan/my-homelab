@@ -11,7 +11,7 @@ tasks:
     internal: true
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
-      - ansible-playbook -i {{.ORACLE_ANSIBLE_INVENTORY}} {{.ORACLE_ANSIBLE_PLAYBOOK}} {{.O_TAG| default ""}}
+      - ansible-playbook -i {{.ORACLE_ANSIBLE_INVENTORY}} {{.ORACLE_ANSIBLE_PLAYBOOK}} {{.O_TAGS| default ""}}
 
   list-nodes:
     desc: List Oracle node(s)
