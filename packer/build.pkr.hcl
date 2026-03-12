@@ -42,10 +42,9 @@ source "proxmox-iso" "ubuntu-kickstart" {
   sockets  = local.sockets
 
   disks {
-    disk_size         = var.vm_disksize
-    storage_pool      = local.disks.storage_pool
-    storage_pool_type = local.disks.storage_pool_type
-    type              = local.disks.type
+    disk_size    = var.vm_disksize
+    storage_pool = local.disks.storage_pool
+    type         = local.disks.type
   }
 
   network_adapters {
@@ -91,7 +90,19 @@ build {
     ]
   }
 
-  # ! 4. POST-STEPS: Store "build" metadata
+  # ! 4. CLEAN-UP: Reset VM for 1st boot
+  provisioner "ansible" {
+    pause_before        = "15s"
+    ansible_env_vars    = local.map_ansible_vars
+    inventory_directory = local.inventory_folder
+    playbook_file       = local.cleanup_playbook
+    use_proxy           = false
+    extra_arguments = [
+      "--extra-vars", "ansible_ssh_pass=${local.ssh_password}"
+    ]
+  }
+
+  # ! 5. POST-STEPS: Store "build" metadata
   post-processor "manifest" {
     output     = local.manifest_file
     strip_path = true

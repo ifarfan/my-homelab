@@ -11,6 +11,9 @@
     - name: Setup base Ubuntu
       ansible.builtin.include_role:
         name: base_24
+      vars:
+        is_hardware: true
+        has_swap: true
 
     - name: Configure modern-linux utilities
       ansible.builtin.include_role:

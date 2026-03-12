@@ -92,9 +92,8 @@ locals {
 
   # Store Template locally on each node
   disks = {
-    storage_pool      = "local-lvm"
-    storage_pool_type = "lvm"
-    type              = "scsi"
+    storage_pool = "local-lvm"
+    type         = "scsi"
   }
 
   network = {
@@ -140,5 +139,6 @@ locals {
   inventory_folder = "./ansible/inventory"
   build_playbook   = "./ansible/playbooks/${var.vm_name}_build.yml"
   test_playbook    = "./ansible/playbooks/${var.vm_name}_test.yml"
+  cleanup_playbook = "./ansible/playbooks/${var.vm_name}_cleanup.yml"
   manifest_file    = "./manifests/${var.vm_name}.json"
 }

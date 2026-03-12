@@ -21,6 +21,7 @@ config() {
         'm0'
         'm1'
         'm2'
+        'm3'
     )
 
     #  Colors

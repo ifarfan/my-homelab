@@ -1,0 +1,31 @@
+---
+#
+# ? Ubuntu VM cleanup + reset
+#
+# ! NOTE:
+#   not installing cloud-init pkg, thus cleaning up files manually
+#   - cloud-init clean --logs --machine-id
+#
+- name: Cleanup and reset Ubuntu 24.04 VM template
+  hosts: default
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Truncate files
+      ansible.builtin.command: |
+        truncate -s 0 /etc/machine-id
+        truncate -s 0 /etc/machine-info
+        truncate -s 0 /var/log/*log
+
+    - name: Remove files + directories
+      ansible.builtin.command: |
+        rm -f /etc/ssh/ssh_host_*
+        rm -f /etc/udev/rules.d/70-persistent-net.rules
+        rm -f /usr/local/bin/goss
+        rm -f /var/lib/cloud/instance
+        rm -rf /var/lib/cloud/data/
+        rm -rf /var/lib/cloud/instances/
+        rm -f /var/lib/dbus/machine-id
+        rm -rf /tmp/*
+        rm -rf /var/tmp/*

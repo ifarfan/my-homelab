@@ -22,6 +22,7 @@ autoinstall:
   packages:
     - cloud-init
     - qemu-guest-agent
+  resize_rootfs: noblock
   ssh:
     allow-pw: true
     install-server: true
@@ -51,8 +52,7 @@ autoinstall:
       #  - Command "mkpasswd" is part of "whois" package
       - name: ubuntu
         gecos: Ubuntu
-        lock_passwd: false
-        passwd: "$6$RF8y3rMqB$8XfcjMSI0wvWnOAvCItqbXdJ4Z1Mdj2l6cKwKq/lOo7NNgjfpMRubLtwKZtxxpvbGz1HzoOS7qbLiZFexQ2D9/"
+        lock_passwd: true
         shell: /bin/bash
         ssh_import_id:
           - gh:ifarfan
