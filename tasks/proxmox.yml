@@ -6,7 +6,7 @@ tasks:
     internal: true
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
-      - ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.P_PLAYBOOK}} {{.P_TAGS:default ""}}
+      - ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.P_PLAYBOOK}} {{.P_TAGS| default ""}}
 
   list-nodes:
     desc: List Proxmox nodes

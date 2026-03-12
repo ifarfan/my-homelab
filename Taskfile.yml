@@ -14,12 +14,22 @@ includes:
   net: ./tasks/net.yml
   proxmox: ./tasks/proxmox.yml
   rpi: ./tasks/rpi.yml
+  testvm: ./tasks/testvm.yml
   tools: ./tasks/tools.yml
 
 vars:
+  HOME_DIR:
+    sh: echo $PWD
   ANSIBLE_DIR: ./ansible
   ANSIBLE_INVENTORY_PROXMOX: inventories/proxmox
   GLOBAL_DOMAIN: $MY_GLOBAL_DOMAIN
   PACKER_DIR: ./packer
-  TERRAFORM_DIR: ./terraform
+  TERRAFORM_DIR: "{{.HOME_DIR}}/terraform"
   TERRAFORM_STATE: $MY_TERRAFORM_STATE
+
+  # ANSIBLE_DIR: "/{{.HOME_DIR}}/ansible"
+  # ANSIBLE_INVENTORY_PROXMOX: "/{{.HOME_DIR}}/ansible/inventories/proxmox"
+  # GLOBAL_DOMAIN: $MY_GLOBAL_DOMAIN
+  # PACKER_DIR: "/{{.HOME_DIR}}/packer"
+  # TERRAFORM_DIR: "/{{.HOME_DIR}}/terraform"
+  # TERRAFORM_STATE: $MY_TERRAFORM_STATE
