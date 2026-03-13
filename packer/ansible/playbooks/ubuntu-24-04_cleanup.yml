@@ -29,3 +29,10 @@
         rm -f /var/lib/dbus/machine-id
         rm -rf /tmp/*
         rm -rf /var/tmp/*
+
+    - name: Disable packer access
+      ansible.builtin.user:
+        name: packer
+        state: present
+        password_lock: true
+        shell: /sbin/nologin
