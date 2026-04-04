@@ -43,33 +43,39 @@ tasks:
     internal: true
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
-      - ansible-playbook -i {{.RPI_ANSIBLE_INVENTORY}} {{.R_PLAYBOOK}} {{.R_TAGS:default ""}}
+      - ansible-playbook -i {{.RPI_ANSIBLE_INVENTORY}} {{.R_PLAYBOOK}} {{.R_TAGS| default ""}}
 
   # ? Ansible (pre-provisioned RPis commands)
   list-rpis-local:
     desc: List RPis local
     cmds:
       - task: ansible-rpi
-        vars: {R_PLAYBOOK: { ref: .RPI_LOCAL_ANSIBLE_PLAYBOOK }, R_TAGS: '--list-hosts'}
+        vars:
+          R_PLAYBOOK: "{{.RPI_LOCAL_ANSIBLE_PLAYBOOK}}"
+          R_TAGS: '--list-hosts'
 
   pre-provision-rpis:
     desc: Provision RPis
     cmds:
       - task: ansible-rpi
-        vars: {R_PLAYBOOK: { ref: .RPI_LOCAL_ANSIBLE_PLAYBOOK }}
+        vars:
+          R_PLAYBOOK: "{{.RPI_LOCAL_ANSIBLE_PLAYBOOK}}"
 
   # ? Ansible
   list-rpis:
     desc: List RPis
     cmds:
       - task: ansible-rpi
-        vars: {R_PLAYBOOK: { ref: .RPI_ANSIBLE_PLAYBOOK }, R_TAGS: '--list-hosts'}
+        vars:
+          R_PLAYBOOK: "{{.RPI_ANSIBLE_PLAYBOOK}}"
+          R_TAGS: '--list-hosts'
 
   provision-rpis:
     desc: Provision RPis
     cmds:
       - task: ansible-rpi
-        vars: {R_PLAYBOOK: { ref: .RPI_ANSIBLE_PLAYBOOK }}
+        vars:
+          R_PLAYBOOK: "{{.RPI_ANSIBLE_PLAYBOOK}}"
 
   update-rpis:
     desc: Update RPis (alias to 'provision-rpis' task)
@@ -80,10 +86,14 @@ tasks:
     desc: "Provision 'Traefik' on RPis"
     cmds:
       - task: ansible-rpi
-        vars: {R_PLAYBOOK: { ref: .RPI_ANSIBLE_PLAYBOOK }, R_TAGS: '--tag traefik'}
+        vars:
+          R_PLAYBOOK: "{{.RPI_ANSIBLE_PLAYBOOK}}"
+          R_TAGS: '--tag traefik'
 
   provision-pulse:
     desc: "Provision 'Pulse' on RPi"
     cmds:
       - task: ansible-rpi
-        vars: {R_PLAYBOOK: { ref: .RPI_ANSIBLE_PLAYBOOK }, R_TAGS: '--tag pulse'}
+        vars:
+          R_PLAYBOOK: "{{.RPI_ANSIBLE_PLAYBOOK}}"
+          R_TAGS: '--tag pulse'

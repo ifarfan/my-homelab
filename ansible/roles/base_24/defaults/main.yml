@@ -51,6 +51,7 @@ apt_default_pkgs_to_install:
   - colordiff
   - curl
   - dnsutils
+  - fdisk
   - git-core
   - grc
   - htop

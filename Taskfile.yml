@@ -14,6 +14,7 @@ includes:
   net: ./tasks/net.yml
   proxmox: ./tasks/proxmox.yml
   rpi: ./tasks/rpi.yml
+  testvm: ./tasks/testvm.yml
   tools: ./tasks/tools.yml
 
 vars:

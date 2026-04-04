@@ -1,0 +1,96 @@
+#cloud-config
+#
+# See:
+# !(LATEST) - https://canonical-subiquity.readthedocs-hosted.com/en/latest/reference/autoinstall-reference.html#user-data
+# !(LATEST) - https://cloudinit.readthedocs.io/en/latest/reference/modules.html#ubuntu-autoinstall
+# - https://github.com/canonical/subiquity/tree/main/examples/autoinstall
+# - https://cloudinit.readthedocs.io/en/latest/topics/examples.html
+#
+autoinstall:
+  version: 1
+  apt:
+    mirror-selection:
+      primary:
+        - country-mirror
+        - uri: http://archive.ubuntu.com/ubuntu
+        - uri: https://mirror.us.leaseweb.net/ubuntu/
+        - uri: https://mirrors.bloomu.edu/ubuntu/
+    fallback: offline-install
+    geoip: true
+  error-commands:
+    - echo "Installation failed. Collecting logs..." >&2
+    - echo "Installer logs:" >&2
+    - cat /var/log/installer/debug >&2
+    - echo "Journal logs:" >&2
+    - cat /var/log/installer/syslog >&2
+    - echo "Error logs:" >&2
+    - cat /var/log/installer/err.log >&2
+    - echo "Logs collected." >&2
+    - sleep 60
+  keyboard:
+    layout: us
+  late-commands:
+    - curtin in-target -- echo "Running late-run steps..."
+    - curtin in-target -- /usr/bin/sleep 30
+  locale: en_US.UTF-8
+  packages:
+    - cloud-init
+    - qemu-guest-agent
+  refresh-installer:
+    update: true
+  source:
+    id: ubuntu-server-minimal
+  ssh:
+    allow-pw: true
+    install-server: true
+  storage:
+    layout:
+      name: direct
+    config:
+      -
+        type: disk
+        id: disk0
+        match:
+          size: largest
+      -
+        type: partition
+        id: boot-partition
+        device: disk0
+        size: 500M
+      -
+        type: partition
+        id: root-partition
+        device: disk0
+        size: -1
+  shutdown: reboot
+  updates: all  # security
+  timezone: Etc/UTC
+  user-data:
+    disable_root: false
+    resize_rootfs: true
+    users:
+      #  - Use "mkpasswd -s -m md5" or "mkpasswd -m sha-512" to hash password
+      #  - Command "mkpasswd" is part of "whois" package
+      -
+        name: ubuntu
+        gecos: Ubuntu
+        lock_passwd: true
+        shell: /bin/bash
+        ssh_import_id:
+          - gh:ifarfan
+        sudo: ALL=(ALL) NOPASSWD:ALL
+      -
+        name: packer
+        gecos: Packer
+        lock_passwd: false
+        passwd: "$6$CnVx7VV3ebD$z9mrBzi3QEzJv.22.G4FWba8./W4/qTdh66ZKIqr4NQnqSY7E852xIZHwaTLV1D5NBCIlIk2A13lX4lp1HYcF/"
+        shell: /bin/bash
+        ssh_import_id:
+          - gh:ifarfan
+        sudo: ALL=(ALL) NOPASSWD:ALL
+  write_files:
+    - content: |
+        127.0.0.1          localhost
+      path: /etc/hosts
+      owner: root:root
+      permissions: '0644'

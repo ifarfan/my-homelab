@@ -1,0 +1,10 @@
+---
+- name: Download + Install Goss
+  ansible.builtin.get_url:
+    url: "{{ goss_url }}"
+    dest: "{{ goss_exec }}"
+    owner: root
+    mode: 0755
+  register: goss_was_downloaded
+  until: goss_was_downloaded is succeeded
+  retries: 3

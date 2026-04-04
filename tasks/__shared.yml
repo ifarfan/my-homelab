@@ -5,9 +5,9 @@
 version: '3'
 
 vars:
-  SERVICE_TF_DIR: '{{.TERRAFORM_DIR}}/{{.SERVICE_VAR}}'
-  SERVICE_TF_STATE: '{{.TERRAFORM_STATE}}/{{.SERVICE_VAR}}.tfstate'
-  SERVICE_ANSIBLE_PLAYBOOK: 'lxc-{{.SERVICE_VAR}}-provision.yml'
+  SERVICE_TF_DIR: "{{.TERRAFORM_DIR}}/{{.SERVICE_VAR}}"
+  SERVICE_TF_STATE: "{{.TERRAFORM_STATE}}/{{.SERVICE_VAR}}.tfstate"
+  SERVICE_ANSIBLE_PLAYBOOK: "lxc-{{.SERVICE_VAR}}-provision.yml"
 
 tasks:
   check-lxc-vars:
@@ -19,9 +19,21 @@ tasks:
       - 'echo ANSIBLE_PLAYBOOK={{.SERVICE_ANSIBLE_PLAYBOOK}}'
 
   # Terraform operations
+  create:
+    internal: true
+    dir: "/{{.SERVICE_TF_DIR}}"
+    preconditions:
+      - sh: test -d {{.TERRAFORM_STATE}}
+        msg: "{{.TERRAFORM_STATE}} not found"
+    cmds:
+      - terraform init -backend-config="path={{.SERVICE_TF_STATE}}"
+      - terraform fmt && terraform validate
+      - terraform apply -lock=false
+      - terraform output
+
   create-lxc:
     internal: true
-    dir: '/{{.SERVICE_TF_DIR}}'
+    dir: "/{{.SERVICE_TF_DIR}}"
     preconditions:
       - sh: test -f {{.SERVICE_TF_STATE}}
         msg: "{{.SERVICE_TF_STATE}} not found"
@@ -31,9 +43,18 @@ tasks:
       - terraform apply -lock=false
       - terraform output
 
+  destroy:
+    internal: true
+    dir: "/{{.SERVICE_TF_DIR}}"
+    preconditions:
+      - sh: test -f {{.SERVICE_TF_STATE}}
+        msg: "{{.SERVICE_TF_STATE}} not found"
+    cmds:
+      - terraform destroy -lock=false -compact-warnings
+
   destroy-lxc:
     internal: true
-    dir: '/{{.SERVICE_TF_DIR}}'
+    dir: "/{{.SERVICE_TF_DIR}}"
     preconditions:
       - sh: test -f {{.SERVICE_TF_STATE}}
         msg: "{{.SERVICE_TF_STATE}} not found"
@@ -42,7 +63,7 @@ tasks:
 
   update-dns:
     internal: true
-    dir: '/{{.SERVICE_TF_DIR}}'
+    dir: "/{{.SERVICE_TF_DIR}}"
     preconditions:
       - sh: test -f {{.SERVICE_TF_STATE}}
         msg: "{{.SERVICE_TF_STATE}} not found"
@@ -84,4 +105,4 @@ tasks:
     internal: true
     dir: "/{{.ANSIBLE_DIR}}"
     cmds:
-      - 'ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.SERVICE_ANSIBLE_PLAYBOOK}} --tag {{.APP_NAME | default ""}}'
+      - 'ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.SERVICE_ANSIBLE_PLAYBOOK}} --tag {{.APP_NAME| default ""}}'
