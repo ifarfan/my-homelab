@@ -1,0 +1,9 @@
+---
+- name: Configure Doppler
+  ansible.builtin.import_tasks: doppler.yml
+
+# - name: Configure Mise
+#   ansible.builtin.import_tasks: mise.yml
+
+# - name: Configure VS Code
+#   ansible.builtin.import_tasks: vscode.yml

@@ -21,7 +21,7 @@ tasks:
   # Terraform operations
   create-lxc:
     internal: true
-    dir: '{{.SERVICE_TF_DIR}}'
+    dir: '/{{.SERVICE_TF_DIR}}'
     preconditions:
       - sh: test -f {{.SERVICE_TF_STATE}}
         msg: "{{.SERVICE_TF_STATE}} not found"
@@ -33,7 +33,7 @@ tasks:
 
   destroy-lxc:
     internal: true
-    dir: '{{.SERVICE_TF_DIR}}'
+    dir: '/{{.SERVICE_TF_DIR}}'
     preconditions:
       - sh: test -f {{.SERVICE_TF_STATE}}
         msg: "{{.SERVICE_TF_STATE}} not found"
@@ -42,7 +42,7 @@ tasks:
 
   update-dns:
     internal: true
-    dir: '{{.SERVICE_TF_DIR}}'
+    dir: '/{{.SERVICE_TF_DIR}}'
     preconditions:
       - sh: test -f {{.SERVICE_TF_STATE}}
         msg: "{{.SERVICE_TF_STATE}} not found"
@@ -59,7 +59,7 @@ tasks:
   # Ansible operations
   patch-lxc:
     internal: true
-    dir: "{{.ANSIBLE_DIR}}"
+    dir: "/{{.ANSIBLE_DIR}}"
     cmds:
       - |
         ansible-playbook \
@@ -76,12 +76,12 @@ tasks:
 
   provision:
     internal: true
-    dir: "{{.ANSIBLE_DIR}}"
+    dir: "/{{.ANSIBLE_DIR}}"
     cmds:
       - "ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.SERVICE_ANSIBLE_PLAYBOOK}}"
 
   provision-app:
     internal: true
-    dir: '{{.ANSIBLE_DIR}}'
+    dir: "/{{.ANSIBLE_DIR}}"
     cmds:
       - 'ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.SERVICE_ANSIBLE_PLAYBOOK}} --tag {{.APP_NAME | default ""}}'
