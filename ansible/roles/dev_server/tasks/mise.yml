@@ -1,7 +1,38 @@
 ---
-sudo apt update -y && sudo apt install -y curl
-sudo install -dm 755 /etc/apt/keyrings
-curl -fSs https://mise.jdx.dev/gpg-key.pub | sudo tee /etc/apt/keyrings/mise-archive-keyring.asc 1> /dev/null
-echo "deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.asc] https://mise.jdx.dev/deb stable main" | sudo tee /etc/apt/sources.list.d/mise.list
-sudo apt update -y
-sudo apt install -y mise
+# See: https://mise.jdx.dev/installing-mise.html
+- name: Install pre-reqs
+  ansible.builtin.apt:
+    pkg: "{{ item }}"
+    state: present
+  loop: "{{ mise_req_pkgs }}"
+
+- name: Install keyrings
+  ansible.builtin.shell:
+    cmd: "install -dm 755 {{ mise_keyrings_path }}"
+  changed_when: false             # noqa: no-changed-when
+
+- name: Download GPG key
+  ansible.builtin.get_url:
+    url: "{{ mise_gpg_url }}"
+    dest: "{{ mise_keyrings_file }}"
+    validate_certs: true
+  changed_when: false             # noqa: no-changed-when
+
+- name: Add apt repository with signed-by attribute
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by={{ mise_keyrings_file }}] https://mise.jdx.dev/deb stable main"
+    state: present
+    filename: mise
+    update_cache: true
+
+- name: Install Mise
+  ansible.builtin.apt:
+    pkg: mise
+    state: present
+    update_cache: true
+    cache_valid_time: "{{ apt_cache_time }}"
+
+- name: Add shell-integration command
+  ansible.builtin.lineinfile:
+    path: /root/.bashrc
+    line: 'eval "$(mise activate bash)"'

@@ -1,8 +1,26 @@
 ---
-metube_directory: /opt/metube
-metube_uri: "metube.{{ global_domain }}"
-metube_port: 8081
+doppler_req_pkgs:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg
+doppler_key_url: https://packages.doppler.com/public/cli/gpg.DE2A7741A397C129.key
+doppler_key_file: doppler-archive-keyring.key
+doppler_gpg_path: /usr/share/keyrings/doppler-archive-keyring.gpg
 
-# permissions needed for "downloads" folder in NAS
-metube_uid: 1024
-metube_gid: 100
+mise_req_pkgs:
+  - curl
+mise_gpg_url: https://mise.jdx.dev/gpg-key.pub
+mise_keyrings_path: /etc/apt/keyrings
+mise_keyrings_file: "{{ mise_keyrings_path }}/mise-archive-keyring.asc"
+
+vscode_req_pkgs:
+  - apt-transport-https
+  - software-properties-common
+vscode_key_url: https://packages.microsoft.com/keys/microsoft.asc
+vscode_key_path: /etc/apt/keyrings/microsoft.asc
+
+dev_repos_folder: /root/repos
+dev_repos_url: https://github.com/ifarfan/
+dev_repos:
+  - my-homelab
