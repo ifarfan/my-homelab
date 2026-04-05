@@ -7,7 +7,7 @@
   loop: "{{ mise_req_pkgs }}"
 
 - name: Install keyrings
-  ansible.builtin.shell:
+  ansible.builtin.command:
     cmd: "install -dm 755 {{ mise_keyrings_path }}"
   changed_when: false             # noqa: no-changed-when
 
@@ -15,6 +15,7 @@
   ansible.builtin.get_url:
     url: "{{ mise_gpg_url }}"
     dest: "{{ mise_keyrings_file }}"
+    mode: 0444
     validate_certs: true
   changed_when: false             # noqa: no-changed-when
 

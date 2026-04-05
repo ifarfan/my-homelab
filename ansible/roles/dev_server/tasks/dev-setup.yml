@@ -15,8 +15,8 @@
 
 - name: Clone Github repos
   ansible.builtin.git:
-    repo: '{{ dev_repos_url }}/{{ item}}.git'
-    dest: "{{ dev_repos_folder }}/{{ item}}"
+    repo: '{{ dev_repos_url }}/{{ item }}.git'
+    dest: "{{ dev_repos_folder }}/{{ item }}"
     version: main
   loop: "{{ dev_repos }}"
 

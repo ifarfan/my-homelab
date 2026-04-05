@@ -9,6 +9,7 @@
   ansible.builtin.get_url:
     url: "{{ vscode_key_url }}"
     dest: "{{ vscode_key_path }}"
+    mode: 0444
     validate_certs: true
   changed_when: false             # noqa: no-changed-when
 

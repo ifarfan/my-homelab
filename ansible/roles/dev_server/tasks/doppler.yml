@@ -7,14 +7,14 @@
 
 - name: Download repository GPG key
   ansible.builtin.get_url:
-    url: "{{ doppler_key_url}}"
+    url: "{{ doppler_key_url }}"
     dest: "/tmp/{{ doppler_key_file }}"
     mode: 0444
     validate_certs: true
   changed_when: false             # noqa: no-changed-when
 
 - name: De-armor downloaded key
-  ansible.builtin.shell:
+  ansible.builtin.command:
     cmd: "gpg --dearmor -o {{ doppler_gpg_path }} /tmp/{{ doppler_key_file }}"
     creates: "{{ doppler_gpg_path }}"
 
