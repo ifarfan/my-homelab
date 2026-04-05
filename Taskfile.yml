@@ -12,6 +12,7 @@ includes:
   devbox: ./tasks/devbox.yml
   grafix: ./tasks/grafix.yml
   net: ./tasks/net.yml
+  oracle: ./tasks/oracle.yml
   proxmox: ./tasks/proxmox.yml
   rpi: ./tasks/rpi.yml
   tools: ./tasks/tools.yml

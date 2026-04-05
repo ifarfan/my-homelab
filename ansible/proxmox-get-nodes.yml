@@ -1,0 +1,19 @@
+---
+- name: Build Proxmox nodes FQDN list
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Dynamic nodes name lookup
+      block:
+
+        - name: Set FQDN for Proxmox nodes
+          ansible.builtin.add_host:
+            hostname: "{{ item }}.{{ global_domain }}"
+            groups: my_proxmox_nodes
+          loop: "{{ groups.proxmox_nodes }}"
+
+        - name: List FQDN Proxmox nodes
+          ansible.builtin.debug:
+            msg: "{{ groups.my_proxmox_nodes }}"
+      tags:
+        - always

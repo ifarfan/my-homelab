@@ -19,6 +19,7 @@
 # ? Oracle provisioning playbook
 - name: Oracle provisioning
   hosts: all
+  remote_user: ubuntu
   become: true
   gather_facts: true
   tasks:

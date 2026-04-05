@@ -41,7 +41,7 @@ tasks:
 
   ansible-rpi:
     internal: true
-    dir: "{{.ANSIBLE_DIR}}"
+    dir: "/{{.ANSIBLE_DIR}}"
     cmds:
       - ansible-playbook -i {{.RPI_ANSIBLE_INVENTORY}} {{.R_PLAYBOOK}} {{.R_TAGS| default ""}}
 
