@@ -1,9 +1,9 @@
 ---
-- name: Build RPis list with FQDN
+- name: Build RPis FQDN list
   hosts: localhost
   gather_facts: false
   tasks:
-    - name: Dynamic host name setup
+    - name: Dynamic host name lookup
       block:
         - name: Set FQDN for RPis
           ansible.builtin.add_host:

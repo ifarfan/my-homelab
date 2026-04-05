@@ -1,6 +1,9 @@
 ---
+- name: Get dynamic nodes list
+  ansible.builtin.import_playbook: proxmox-get-nodes.yml
+
 - name: Reboot Proxmox servers
-  hosts: proxmox_nodes
+  hosts: my_proxmox_nodes
   become: true
   gather_facts: false
   tasks:

@@ -1,7 +1,7 @@
 # Hardware
 
 Currently, running:
-  - `3` macmini(s) as a **Proxmox** cluster
+  - `4` macmini(s) as a **Proxmox** cluster
   - `1` stand-alone macmini as a **Proxmox Backup Server**
   - `2` **Raspberry Pis** for internal DNS and miscellaneous chores
 
