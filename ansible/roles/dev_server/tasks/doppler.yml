@@ -1,0 +1,33 @@
+---
+- name: Install pre-reqs
+  ansible.builtin.apt:
+    pkg: "{{ item }}"
+    state: present
+  loop: "{{ doppler_req_pkgs }}"
+
+- name: Download repository GPG key
+  ansible.builtin.get_url:
+    url: "{{ doppler_key_url }}"
+    dest: "/tmp/{{ doppler_key_file }}"
+    mode: 0444
+    validate_certs: true
+  changed_when: false             # noqa: no-changed-when
+
+- name: De-armor downloaded key
+  ansible.builtin.command:
+    cmd: "gpg --dearmor -o {{ doppler_gpg_path }} /tmp/{{ doppler_key_file }}"
+    creates: "{{ doppler_gpg_path }}"
+
+- name: Add apt repository with signed-by attribute
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64, signed-by={{ doppler_gpg_path }}] https://packages.doppler.com/public/cli/deb/debian any-version main"
+    state: present
+    filename: doppler-cli
+    update_cache: true
+
+- name: Install Doppler CLI
+  ansible.builtin.apt:
+    pkg: doppler
+    state: present
+    update_cache: true
+    cache_valid_time: "{{ apt_cache_time }}"

@@ -1,0 +1,44 @@
+---
+- name: Create Repos directory
+  ansible.builtin.file:
+    path: "{{ dev_repos_folder }}"
+    state: directory
+    mode: 0755
+
+- name: Create Workspace file
+  ansible.builtin.template:
+    src: repos.code-workspace.j2
+    dest: "{{ dev_repos_folder }}/repos.code-workspace"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Clone Github repos
+  ansible.builtin.git:
+    repo: '{{ dev_repos_url }}/{{ item }}.git'
+    dest: "{{ dev_repos_folder }}/{{ item }}"
+    version: main
+  loop: "{{ dev_repos }}"
+
+- name: Create .git directory
+  ansible.builtin.file:
+    path: "/root/.git"
+    state: directory
+    mode: 0755
+
+- name: List of local git files
+  ansible.builtin.command:
+    ls -1 "{{ role_path }}/files/"
+  delegate_to: localhost
+  become: false
+  changed_when: false
+  register: git_files
+
+- name: Copy git files
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/root/.git/.{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  loop: "{{ git_files.stdout_lines }}"

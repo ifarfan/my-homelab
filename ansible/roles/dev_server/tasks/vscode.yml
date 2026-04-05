@@ -1,0 +1,28 @@
+---
+- name: Install pre-reqs
+  ansible.builtin.apt:
+    pkg: "{{ item }}"
+    state: present
+  loop: "{{ vscode_req_pkgs }}"
+
+- name: Download armored key
+  ansible.builtin.get_url:
+    url: "{{ vscode_key_url }}"
+    dest: "{{ vscode_key_path }}"
+    mode: 0444
+    validate_certs: true
+  changed_when: false             # noqa: no-changed-when
+
+- name: Add apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by={{ vscode_key_path }}] https://packages.microsoft.com/repos/vscode stable main"
+    state: present
+    filename: vscode
+    update_cache: true
+
+- name: Install Visual Studio Code
+  ansible.builtin.apt:
+    pkg: code
+    state: present
+    update_cache: true
+    cache_valid_time: "{{ apt_cache_time }}"

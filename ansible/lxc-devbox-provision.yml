@@ -47,3 +47,10 @@
       ansible.builtin.include_role:
         name: wakapi
       tags: wakapi
+
+    - name: Install Dev Server
+      ansible.builtin.include_role:
+        name: dev_server
+        apply:
+          tags: dev_server
+      tags: dev_server

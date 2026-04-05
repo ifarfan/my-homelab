@@ -1,0 +1,9 @@
+{
+  "folders": [
+    {% for item in dev_repos %}
+      {
+        "path": "{{ item }}"
+      }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}

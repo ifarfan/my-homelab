@@ -1,0 +1,39 @@
+---
+# See: https://mise.jdx.dev/installing-mise.html
+- name: Install pre-reqs
+  ansible.builtin.apt:
+    pkg: "{{ item }}"
+    state: present
+  loop: "{{ mise_req_pkgs }}"
+
+- name: Install keyrings
+  ansible.builtin.command:
+    cmd: "install -dm 755 {{ mise_keyrings_path }}"
+  changed_when: false             # noqa: no-changed-when
+
+- name: Download GPG key
+  ansible.builtin.get_url:
+    url: "{{ mise_gpg_url }}"
+    dest: "{{ mise_keyrings_file }}"
+    mode: 0444
+    validate_certs: true
+  changed_when: false             # noqa: no-changed-when
+
+- name: Add apt repository with signed-by attribute
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by={{ mise_keyrings_file }}] https://mise.jdx.dev/deb stable main"
+    state: present
+    filename: mise
+    update_cache: true
+
+- name: Install Mise
+  ansible.builtin.apt:
+    pkg: mise
+    state: present
+    update_cache: true
+    cache_valid_time: "{{ apt_cache_time }}"
+
+- name: Add shell-integration command
+  ansible.builtin.lineinfile:
+    path: /root/.bashrc
+    line: 'eval "$(mise activate bash)"'

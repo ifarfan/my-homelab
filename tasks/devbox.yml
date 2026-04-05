@@ -49,3 +49,9 @@ tasks:
     cmds:
       - task: shared:provision-app
         vars: {APP_NAME: 'wakapi'}
+
+  provision-dev-server:
+    desc: 'Provision "Dev Server" on "{{.DEVBOX_HOST}}"'
+    cmds:
+      - task: shared:provision-app
+        vars: {APP_NAME: 'dev_server'}
