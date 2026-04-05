@@ -74,7 +74,7 @@
 
   when: ansible_architecture == "aarch64"
 
-- name: Install "starship" prompt
+- name: Install "starship" prompt     # noqa: command-instead-of-module
   ansible.builtin.shell:
     cmd: curl -sS https://starship.rs/install.sh | sh -s -- --force
     creates: /usr/local/bin/starship

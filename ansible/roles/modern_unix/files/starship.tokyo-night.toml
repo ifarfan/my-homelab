@@ -2,7 +2,8 @@
 
 format = """
 [░▒▓](#a3aed2)\
-[  ](bg:#a3aed2 fg:#090c0c)\
+[ ](bg:#a3aed2 fg:#090c0c)\
+$os\
 [](bg:#769ff0 fg:#a3aed2)\
 $directory\
 [](fg:#769ff0 bg:#394260)\
@@ -54,8 +55,41 @@ symbol = ""
 style = "bg:#212736"
 format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
 
+[os]
+disabled = false
+style = "bg:#a3aed2 fg:#090c0c"
+
+[os.symbols]
+Windows = "󰍲"
+Ubuntu = "󰕈"
+SUSE = ""
+Raspbian = "󰐿"
+Mint = "󰣭"
+Macos = "󰀵"
+Manjaro = ""
+Linux = "󰌽"
+Gentoo = "󰣨"
+Fedora = "󰣛"
+Alpine = ""
+Amazon = ""
+Android = ""
+AOSC = ""
+Arch = "󰣇"
+Artix = "󰣇"
+EndeavourOS = ""
+CentOS = ""
+Debian = "󰣚"
+Redhat = "󱄛"
+RedHatEnterprise = "󱄛"
+Pop = ""
+
 [php]
 symbol = ""
+style = "bg:#212736"
+format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
+
+[python]
+symbol = ""
 style = "bg:#212736"
 format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
 
