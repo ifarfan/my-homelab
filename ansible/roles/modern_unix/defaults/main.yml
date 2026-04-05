@@ -148,3 +148,5 @@ shell_integrations:
   - ''
   - '[[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh'    # bash-exec, pre-requisite for atuin
   - 'eval "$(atuin init bash)"'                                   # Shell history
+  - ''
+  - 'eval "$(starship init bash)"'                                # Starship prompt

@@ -48,3 +48,11 @@
     owner: root
     group: root
     mode: 0600
+
+- name: Copy "starship" config
+  ansible.builtin.copy:
+    src: starship.pastel-powerline.toml
+    dest: /root/.config/starship.toml
+    owner: root
+    group: root
+    mode: 0644
