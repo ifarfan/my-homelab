@@ -1,13 +1,13 @@
 [core]
     editor = nano
-    excludesfile = ~/.git/.gitignore_global
+    excludesfile = ~/.gitignore_global
     sshCommand = "ssh -F /dev/null -o StrictHostKeyChecking=no"
     pager = delta
 
-[include]
-    path = ~/.git/.gitconfig.user
-    #  Put your Github token here
-    path = ~/.git/.gitconfig.github
+# [include]
+#     path = ~/.git/.gitconfig.user
+#     #  Put your Github token here
+#     path = ~/.git/.gitconfig.github
 
 # [credential]
 #    helper = osxkeychain

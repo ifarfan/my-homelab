@@ -13,4 +13,7 @@ doppler login
 cd ~/repos/my-homelab
 ./fetch-secrets.sh
 ./fetch-devbox-keys.sh
+
+# Install cli tools
+mise install
 ```
