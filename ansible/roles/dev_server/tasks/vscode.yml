@@ -15,7 +15,7 @@
 
 - name: Add apt repository
   ansible.builtin.apt_repository:
-    repo: "deb [arch=amd64 signed-by={{ vscode_key_path }}] https://packages.microsoft.com/repos/vscode stable main"
+    repo: "deb [arch={{ ansible_architecture }} signed-by={{ vscode_key_path }}] https://packages.microsoft.com/repos/vscode stable main"
     state: present
     filename: vscode
     update_cache: true

@@ -20,6 +20,10 @@
       ansible.builtin.include_role:
         name: modern_unix
 
+    - name: Install Restic
+      ansible.builtin.include_role:
+        name: restic
+
     # ? Docker daemon + docker compose apps
     - name: Install docker
       ansible.builtin.include_role:
@@ -39,13 +43,17 @@
     - name: Install Traefik
       ansible.builtin.include_role:
         name: traefik
+        apply:
+          tags: traefik
+      tags: traefik
       vars:
         hostname_in_uri: true
-      tags: traefik
 
     - name: Install Wakapi
       ansible.builtin.include_role:
         name: wakapi
+        apply:
+          tags: wakapi
       tags: wakapi
 
     - name: Install Dev Server

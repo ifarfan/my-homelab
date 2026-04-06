@@ -1,0 +1,22 @@
+---
+- name: Download GPG key
+  ansible.builtin.get_url:
+    url: "{{ gh_key_url }}"
+    dest: "{{ gh_gpg_path }}"
+    mode: 0444
+    validate_certs: true
+  changed_when: false             # noqa: no-changed-when
+
+- name: Add apt repository with signed-by attribute
+  ansible.builtin.apt_repository:
+    repo: "deb [arch={{ ansible_architecture }} signed-by={{ gh_gpg_path }}] https://cli.github.com/packages stable main"
+    state: present
+    filename: github-cli
+    update_cache: true
+
+- name: Install GitHub CLI
+  ansible.builtin.apt:
+    pkg: gh
+    state: present
+    update_cache: true
+    cache_valid_time: "{{ apt_cache_time }}"

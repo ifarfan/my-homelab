@@ -39,9 +39,11 @@
     - name: Install Traefik
       ansible.builtin.include_role:
         name: traefik
+        apply:
+          tags: traefik
+      tags: traefik
       vars:
         hostname_in_uri: true
-      tags: traefik
 
     - name: Install Atuin
       ansible.builtin.include_role:

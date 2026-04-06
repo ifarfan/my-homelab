@@ -1,11 +1,5 @@
 ---
 # See: https://mise.jdx.dev/installing-mise.html
-- name: Install pre-reqs
-  ansible.builtin.apt:
-    pkg: "{{ item }}"
-    state: present
-  loop: "{{ mise_req_pkgs }}"
-
 - name: Install keyrings
   ansible.builtin.command:
     cmd: "install -dm 755 {{ mise_keyrings_path }}"
