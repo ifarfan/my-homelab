@@ -10,3 +10,6 @@
 
 - name: Configure Developer setup
   ansible.builtin.import_tasks: dev-setup.yml
+
+- name: Configure Github CLI
+  ansible.builtin.import_tasks: gh-cli.yml

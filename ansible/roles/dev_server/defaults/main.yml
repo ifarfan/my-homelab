@@ -8,8 +8,6 @@ doppler_key_url: https://packages.doppler.com/public/cli/gpg.DE2A7741A397C129.ke
 doppler_key_file: doppler-archive-keyring.key
 doppler_gpg_path: /usr/share/keyrings/doppler-archive-keyring.gpg
 
-mise_req_pkgs:
-  - curl
 mise_gpg_url: https://mise.jdx.dev/gpg-key.pub
 mise_keyrings_path: /etc/apt/keyrings
 mise_keyrings_file: "{{ mise_keyrings_path }}/mise-archive-keyring.asc"
@@ -24,3 +22,6 @@ dev_repos_folder: /root/repos
 dev_repos_url: https://github.com/ifarfan/
 dev_repos:
   - my-homelab
+
+gh_key_url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+gh_gpg_path: /etc/apt/keyrings/githubcli-archive-keyring.gpg
