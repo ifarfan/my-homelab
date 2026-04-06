@@ -26,3 +26,24 @@
     state: present
     update_cache: true
     cache_valid_time: "{{ apt_cache_time }}"
+
+- name: Create Repos directory
+  ansible.builtin.file:
+    path: "{{ vscode_repos_folder }}"
+    state: directory
+    mode: 0755
+
+- name: Clone Github repos
+  ansible.builtin.git:
+    repo: '{{ vscode_repos_url }}/{{ item }}.git'
+    dest: "{{ vscode_repos_folder }}/{{ item }}"
+    version: main
+  loop: "{{ vscode_repos }}"
+
+- name: Create Workspace file
+  ansible.builtin.template:
+    src: repos.code-workspace.j2
+    dest: "{{ vscode_repos_folder }}/repos.code-workspace"
+    owner: root
+    group: root
+    mode: 0644

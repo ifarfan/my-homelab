@@ -2,6 +2,8 @@
 
 Install Galaxy collections
 ```shell
+ansible-galaxy collection install -r ansible/requirements.yml
+
 # initial install
 ansible-galaxy collection install community.proxmox
 ansible-galaxy collection install community.docker

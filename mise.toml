@@ -1,0 +1,19 @@
+[tools]
+# Ansible
+python = "3.12"
+"pipx:ansible-core" = { version = "2.18.6", depends = "python", postinstall = "ansible-galaxy collection install -r ansible/requirements.yml" }
+"pipx:ansible-lint" = "latest"
+"pipx:yamllint" = "latest"
+
+# Terraform
+terraform = "1.2.9"
+tflint = "latest"
+
+# Security
+checkov = "latest"
+trufflehog = "latest"
+
+# Miscellaneous
+jq = "latest"
+circleci = "latest"
+editorconfig-checker = "latest"

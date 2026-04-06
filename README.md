@@ -3,7 +3,7 @@ Documenting my `homelab` journey using a `Proxmox` cluster running, primarily, L
 
 *Grosso modo*,
 - Configure + manage **Proxmox** nodes via `Ansible`
-- Create VMs + LXC containers via `Terraform`
+- Create VMs + LXC containers + DNS records via `Terraform`
 - Manage VMs + LXC containers via `Ansible`
 - Also manage Raspberry Pis via `Ansible`
 - Create VM templates via `Packer`
@@ -18,7 +18,7 @@ Documenting my `homelab` journey using a `Proxmox` cluster running, primarily, L
 1. [Proxmox](docs/proxmox.md) notes + configuration steps
 1. [Raspberry Pis](docs/rpi.md) setup + configuration
 1. Using [Task](docs/task.md) for encapsulating all jobs/scripts/work
-1. [Terraform](docs/terraform.md) for launching LXCs & VMs
+1. [Terraform](docs/terraform.md) for launching LXCs & VMs + DNS records
 1. [Ansible](docs/ansible.md) for configuring LXCs & VMs and miscellaneous orchestration tasks
 1. [Packer](docs/packer.md) for creating VM templates
 1. [Oracle Cloud](docs/oracle.md) for running a remote VM for external tasks/workflows

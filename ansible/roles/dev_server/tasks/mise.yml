@@ -31,3 +31,12 @@
   ansible.builtin.lineinfile:
     path: /root/.bashrc
     line: 'eval "$(mise activate bash)"'
+
+- name: Install autocompletion     # noqa: command-instead-of-module
+  ansible.builtin.shell: |
+    mise use -g usage
+    mkdir -p ~/.local/share/bash-completion/completions/
+    mise completion bash --include-bash-completion-lib > ~/.local/share/bash-completion/completions/mise
+  args:
+    executable: /bin/bash
+    creates: ~/.local/share/bash-completion/completions/mise
