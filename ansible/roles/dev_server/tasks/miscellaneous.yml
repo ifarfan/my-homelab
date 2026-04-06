@@ -14,12 +14,6 @@
     group: root
     state: link
 
-- name: Create .git directory
-  ansible.builtin.file:
-    path: "/root/.git"
-    state: directory
-    mode: 0755
-
 - name: List of local git files
   ansible.builtin.command:
     ls -1 "{{ role_path }}/files/"
@@ -31,7 +25,7 @@
 - name: Copy git files
   ansible.builtin.copy:
     src: "{{ item }}"
-    dest: "/root/.git/.{{ item }}"
+    dest: "/root/.{{ item }}"
     owner: root
     group: root
     mode: 0644
