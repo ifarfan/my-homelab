@@ -1,24 +1,18 @@
 ---
-- name: Create Repos directory
-  ansible.builtin.file:
-    path: "{{ dev_repos_folder }}"
-    state: directory
-    mode: 0755
+- name: Install NFS client and mount volumes
+  ansible.builtin.include_role:
+    name: nfs_client
+  vars:
+    nfs_client_mounts:
+      - { volume: devbox, path: /mnt/devbox, rights: rw }
 
-- name: Create Workspace file
-  ansible.builtin.template:
-    src: repos.code-workspace.j2
-    dest: "{{ dev_repos_folder }}/repos.code-workspace"
+- name: Symlink to mimic MacOS path
+  ansible.builtin.file:
+    src: /mnt
+    dest: /Volumes
     owner: root
     group: root
-    mode: 0644
-
-- name: Clone Github repos
-  ansible.builtin.git:
-    repo: '{{ dev_repos_url }}/{{ item }}.git'
-    dest: "{{ dev_repos_folder }}/{{ item }}"
-    version: main
-  loop: "{{ dev_repos }}"
+    state: link
 
 - name: Create .git directory
   ansible.builtin.file:

@@ -1,0 +1,7 @@
+---
+collections:
+  - name: community.proxmox
+    version: ">=1.0.1"
+
+  - name: community.docker
+    version: ">=4.6.1"

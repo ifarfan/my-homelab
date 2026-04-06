@@ -8,8 +8,8 @@
 - name: Configure VS Code
   ansible.builtin.import_tasks: vscode.yml
 
-- name: Configure Developer setup
-  ansible.builtin.import_tasks: dev-setup.yml
-
 - name: Configure Github CLI
   ansible.builtin.import_tasks: gh-cli.yml
+
+- name: Other miscellaneous tasks
+  ansible.builtin.import_tasks: miscellaneous.yml
