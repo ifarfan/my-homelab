@@ -15,6 +15,7 @@ checkov = "latest"
 trufflehog = "latest"
 
 # Miscellaneous
-jq = "latest"
 circleci = "latest"
 editorconfig-checker = "latest"
+jq = "latest"
+task = "3.49"
