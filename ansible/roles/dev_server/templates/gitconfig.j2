@@ -4,14 +4,6 @@
     sshCommand = "ssh -F /dev/null -o StrictHostKeyChecking=no"
     pager = delta
 
-# [include]
-#     path = ~/.git/.gitconfig.user
-#     #  Put your Github token here
-#     path = ~/.git/.gitconfig.github
-
-# [credential]
-#    helper = osxkeychain
-
 [alias]
     #  Get the current branch name (not so useful in itself, but used in other aliases)
     branch-name = !git rev-parse --abbrev-ref HEAD
@@ -92,3 +84,15 @@
 
 [pull]
     rebase = false
+
+[credential "https://github.com"]
+    helper =
+    helper = !/usr/bin/gh auth git-credential
+
+[credential "https://gist.github.com"]
+    helper =
+    helper = !/usr/bin/gh auth git-credential
+
+[user]
+    name = {{ gh_name }}
+    email = {{ gh_email }}
