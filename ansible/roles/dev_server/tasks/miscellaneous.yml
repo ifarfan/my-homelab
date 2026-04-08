@@ -14,19 +14,18 @@
     group: root
     state: link
 
-- name: List of local git files
-  ansible.builtin.command:
-    ls -1 "{{ role_path }}/files/"
-  delegate_to: localhost
-  become: false
-  changed_when: false
-  register: git_files
-
-- name: Copy git files
-  ansible.builtin.copy:
-    src: "{{ item }}"
-    dest: "/root/.{{ item }}"
+- name: Copy git config
+  ansible.builtin.template:
+    src: gitconfig.j2
+    dest: /root/.gitconfig
     owner: root
     group: root
     mode: 0644
-  loop: "{{ git_files.stdout_lines }}"
+
+- name: Copy global git ignore
+  ansible.builtin.copy:
+    src: gitignore_global
+    dest: /root/.gitignore_global
+    owner: root
+    group: root
+    mode: 0644
