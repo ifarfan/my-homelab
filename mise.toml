@@ -1,6 +1,6 @@
 [tools]
 # Ansible
-python = { version = "3.12", postinstall = "/root/.local/share/mise/installs/pipx-ansible-core/2.18.6/venvs/ansible-core/bin/python -m pip install -r requirements.txt" }
+python = { version = "3.12", postinstall = "/root/.local/share/mise/installs/python/3.12/bin/python3.12 -m pip install --upgrade requests" }
 pipx = "1.11"
 "pipx:ansible-core" = { version = "2.18.6", depends = ["python", "pipx"], postinstall = "ansible-galaxy collection install -r ansible/requirements.yml" }
 "pipx:ansible-lint" = "latest"
