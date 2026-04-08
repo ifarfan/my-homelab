@@ -1,25 +1,33 @@
 ---
 - name: Create app directory
   ansible.builtin.file:
-    path: "{{ termix_directory }}"
+    path: "{{ pocket_id_directory }}"
     state: directory
     mode: 0755
+
+- name: Copy .ENV file
+  ansible.builtin.template:
+    src: .env.j2
+    dest: "{{ pocket_id_directory }}/.env"
+    owner: root
+    group: root
+    mode: 0600
 
 - name: Copy docker-compose file
   ansible.builtin.template:
     src: docker-compose.yml.j2
-    dest: "{{ termix_directory }}/docker-compose.yml"
+    dest: "{{ pocket_id_directory }}/docker-compose.yml"
     owner: root
     group: root
     mode: 0644
 
 - name: Create and start app
   community.docker.docker_compose_v2:
-    project_src: "{{ termix_directory }}"
+    project_src: "{{ pocket_id_directory }}"
 
 - name: Wait until certificate is registered
   ansible.builtin.uri:
-    url: "https://{{ termix_uri }}/"
+    url: "https://{{ pocket_id_uri }}/"
     validate_certs: true
     status_code:
       - 200

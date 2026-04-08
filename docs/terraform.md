@@ -2,34 +2,21 @@
 Use Terraform for `IaC` with **Proxmox**
 
 ## Installation
-Install **Terraform** via `tfenv`
+Install **Terraform** and auxiliary tools via `mise` (versions managed in `mise.toml`)
 ```shell
-brew install tfenv
-tfenv install 0.15.5
-tfenv use 0.15.5
-tfenv list
+mise install
 ```
 
 ## Usage
-For virtually all **Terraform** plans, from `terraform` root folder:
+- **Terraform** is invoked via `task` and all plans are stored under `terraform` folder
+- Notice use of `var-file` (to use secrets) and `-backend-config` for state-file
 
-1. Create `template` folder + symlink appropriate "secrets" file
-   ```shell
-   mkdir new-template && cd new-template
-   ln -s ../secrets.auto.tfvars secrets.auto.tfvars
-   ```
-1. Proceed with `Terrafom` as usual
-   ```shell
-   tf init
-   tf validate && tf fmt
-   tf plan -compact-warnings
-   tf apply -auto-approve
-   ```
 
 ## Notes
 - Password variables are stored under `secrets.auto.tfvars` and are invoked automatically
-- Use `secrets.auto.tfvars.sample` as a reference file
-- **NOTE**: ensure they are never checked into **git** :warning:
+- See `secrets.auto.tfvars.sample` as a reference file
+- Run `./fetch-secrets.sh` to populate secrets + credentials
+- **NOTE**: ensure secrets file is never checked into **git** :warning:
 
 
 ## Troubleshooting

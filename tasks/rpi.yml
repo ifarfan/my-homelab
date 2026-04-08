@@ -36,6 +36,7 @@ tasks:
           -lock=false                             \
           -compact-warnings                       \
           -parallelism=1                          \
+          -var-file={{.TERRAFORM_SECRETS}}        \
           -target=cloudflare_record.cname_records \
           -target=cloudflare_record.dns_record
 

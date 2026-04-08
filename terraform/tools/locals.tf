@@ -31,6 +31,7 @@ locals {
     "dumbpad",
     "it-tools",
     "networking-toolbox",
+    "pocket-id",
     "speedtest-tracker",
     "termix",
     "traefik-${local.hostname}",

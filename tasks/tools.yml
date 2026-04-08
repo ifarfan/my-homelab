@@ -85,3 +85,9 @@ tasks:
     cmds:
       - task: shared:provision-app
         vars: {APP_NAME: 'bichon'}
+
+  provision-pocket-id:
+    desc: 'Provision "Pocket ID" on "{{.TOOLS_HOST}}"'
+    cmds:
+      - task: shared:provision-app
+        vars: {APP_NAME: 'pocket_id'}

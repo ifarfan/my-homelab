@@ -1,0 +1,8 @@
+---
+pocket_id_directory: /opt/pocket-id
+pocket_id_version: v2
+pocket_id_uri: "pocket-id.{{ global_domain }}"
+pocket_id_port: 1411
+
+pocket_id_encryption_key: "{{ lookup('ansible.builtin.ini', 'encryption_key', section='pocket_id', file='credentials.ini') }}"
+pocket_id_maxmind_license_key: "{{ lookup('ansible.builtin.ini', 'maxmind_license_key', section='pocket_id', file='credentials.ini') }}"

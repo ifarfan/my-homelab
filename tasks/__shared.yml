@@ -28,7 +28,9 @@ tasks:
     cmds:
       - terraform init -backend-config="path={{.SERVICE_TF_STATE}}"
       - terraform fmt && terraform validate
-      - terraform apply -lock=false
+      - terraform apply \
+          -lock=false   \
+          -var-file={{.TERRAFORM_SECRETS}}
       - terraform output
 
   create-lxc:
@@ -40,7 +42,9 @@ tasks:
     cmds:
       - terraform init -backend-config="path={{.SERVICE_TF_STATE}}"
       - terraform fmt && terraform validate
-      - terraform apply -lock=false
+      - terraform apply \
+          -lock=false   \
+          -var-file={{.TERRAFORM_SECRETS}}
       - terraform output
 
   destroy:
@@ -50,7 +54,10 @@ tasks:
       - sh: test -f {{.SERVICE_TF_STATE}}
         msg: "{{.SERVICE_TF_STATE}} not found"
     cmds:
-      - terraform destroy -lock=false -compact-warnings
+      - terraform destroy   \
+          -lock=false       \
+          -compact-warnings \
+          -var-file={{.TERRAFORM_SECRETS}}
 
   destroy-lxc:
     internal: true
@@ -59,7 +66,10 @@ tasks:
       - sh: test -f {{.SERVICE_TF_STATE}}
         msg: "{{.SERVICE_TF_STATE}} not found"
     cmds:
-      - terraform destroy -lock=false -compact-warnings
+      - terraform destroy   \
+          -lock=false       \
+          -compact-warnings \
+          -var-file={{.TERRAFORM_SECRETS}}
 
   update-dns:
     internal: true
@@ -75,6 +85,7 @@ tasks:
           -lock=false       \
           -compact-warnings \
           -parallelism=1    \
+          -var-file={{.TERRAFORM_SECRETS}} \
           -target=module.my_lxc.cloudflare_record.cname_records
 
   # Ansible operations
