@@ -19,3 +19,10 @@
     pkg: "{{ item }}"
     state: present
   loop: "{{ miscellaneous_pkgs }}"
+
+- name: Link alternate starship theme
+  ansible.builtin.file:
+    src: "/root/.config/starship.catpuccin.toml"
+    dest: "/root/.config/starship.toml"
+    state: link
+    force: true
