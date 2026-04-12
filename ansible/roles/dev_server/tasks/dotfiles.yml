@@ -28,6 +28,7 @@
     dest: "{{ dotfiles_path }}"
     owner: root
     group: root
+    mode: preserve
 
 - name: Link all source dotfiles
   ansible.builtin.file:

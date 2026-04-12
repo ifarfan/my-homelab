@@ -9,7 +9,7 @@
 - name: Install Prezto
   ansible.builtin.git:
     repo: "{{ prezto_repo_url }}"
-    dest: "{{ prezto_path}}"
+    dest: "{{ prezto_path }}"
     recursive: true
     update: false
     version: master
