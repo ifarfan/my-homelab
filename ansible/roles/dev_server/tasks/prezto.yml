@@ -35,7 +35,7 @@
     dest: "/root/.{{ item }}"
     state: link
     force: true
-  with_items: "{{ zsh_files.stdout_lines }}"
+  loop: "{{ zsh_files.stdout_lines }}"
 
 - name: Set Zsh as default shell
   ansible.builtin.user:

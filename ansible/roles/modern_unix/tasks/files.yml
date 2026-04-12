@@ -22,13 +22,13 @@
     url: "{{ item.url }}"
     dest: "{{ item.file }}"
     mode: 0644
-  with_items: "{{ url_downloads }}"
+  loop: "{{ url_downloads }}"
 
 - name: Add shell-integration commands
   ansible.builtin.lineinfile:
     path: /root/.bashrc
     line: "{{ item }}"
-  with_items: "{{ shell_integrations }}"
+  loop: "{{ shell_integrations }}"
 
 - name: Create "atuin" app sub-directories
   ansible.builtin.file:

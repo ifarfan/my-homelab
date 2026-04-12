@@ -3,7 +3,7 @@
   ansible.builtin.apt:
     pkg: "{{ item }}"
     state: present
-  with_items: "{{ vscode_req_pkgs }}"
+  loop: "{{ vscode_req_pkgs }}"
 
 - name: Download armored key
   ansible.builtin.get_url:
@@ -38,7 +38,7 @@
     repo: '{{ vscode_repos_url }}/{{ item }}.git'
     dest: "{{ vscode_repos_folder }}/{{ item }}"
     version: main
-  with_items: "{{ vscode_repos }}"
+  loop: "{{ vscode_repos }}"
 
 - name: Create Workspace file
   ansible.builtin.template:
