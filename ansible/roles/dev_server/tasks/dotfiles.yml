@@ -1,0 +1,46 @@
+---
+- name: Install dircolors
+  ansible.builtin.git:
+    repo: "{{ dircolors_repo_url }}"
+    dest: "{{ dircolors_path }}"
+    update: true
+    version: master
+
+- name: Link dircolors file
+  ansible.builtin.file:
+    src: "{{ dircolors_path }}/dircolors.256dark"
+    dest: "{{ dircolors_file }}"
+    state: link
+    force: true
+
+- name: List of source dotfiles           # noqa: command-instead-of-module
+  ansible.builtin.command:
+    cmd: find . -maxdepth 1 -type f -printf "%f\n"
+    chdir: "{{ role_path }}/files/dotfiles/"
+  delegate_to: localhost
+  become: false
+  changed_when: false
+  register: source_dotfiles
+
+- name: Copy dotfiles folder contents
+  ansible.builtin.copy:
+    src: dotfiles/
+    dest: "{{ dotfiles_path }}"
+    owner: root
+    group: root
+
+- name: Link all source dotfiles
+  ansible.builtin.file:
+    src: "{{ dotfiles_path }}/{{ item }}"
+    dest: "/root/.{{ item }}"
+    state: link
+    force: true
+  with_items: "{{ source_dotfiles.stdout_lines }}"
+
+- name: Copy git config
+  ansible.builtin.template:
+    src: gitconfig.j2
+    dest: /root/.gitconfig
+    owner: root
+    group: root
+    mode: 0644
