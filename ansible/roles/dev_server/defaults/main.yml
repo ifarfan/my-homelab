@@ -1,4 +1,13 @@
 ---
+prezto_repo_url: https://github.com/sorin-ionescu/prezto
+prezto_path: /root/.zprezto
+
+dircolors_repo_url: https://github.com/seebi/dircolors-solarized
+dircolors_path: /root/.dircolors-solarized
+dircolors_file: /root/.dircolors
+
+dotfiles_path: /root/.dotfiles
+
 doppler_req_pkgs:
   - apt-transport-https
   - ca-certificates
@@ -26,4 +35,7 @@ gh_key_url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
 gh_gpg_path: /etc/apt/keyrings/githubcli-archive-keyring.gpg
 
 gh_name: "{{ lookup('ansible.builtin.ini', 'name', section='github', file='credentials.ini') }}"
-gh_email: "{{ lookup('ansible.builtin.ini', 'email', section='github', file='credentials.ini') }}"
+gh_email: "{{ lookup('ansible.builtin.ini', 'email', section='github', file='credentials.ini') }}"                   # Mise shell integration
+
+miscellaneous_pkgs:
+  - exa

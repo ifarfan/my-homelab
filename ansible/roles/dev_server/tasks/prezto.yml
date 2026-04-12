@@ -1,0 +1,43 @@
+---
+- name: Install Zsh
+  ansible.builtin.apt:
+    pkg: zsh
+    state: present
+    update_cache: true
+    cache_valid_time: "{{ apt_cache_time }}"
+
+- name: Install Prezto
+  ansible.builtin.git:
+    repo: "{{ prezto_repo_url }}"
+    dest: "{{ prezto_path }}"
+    recursive: true
+    update: false
+    version: master
+
+- name: Set permissions on ~/.zprezto
+  ansible.builtin.file:
+    path: /root/.zprezto
+    owner: root
+    group: root
+    mode: 0700
+
+- name: List of Prezto Zsh* files          # noqa: command-instead-of-module
+  ansible.builtin.shell:
+    cmd: ls -1 z*
+    executable: /bin/bash
+    chdir: "{{ prezto_path }}/runcoms"
+  changed_when: false
+  register: zsh_files
+
+- name: Link all Prezto Zsh* files
+  ansible.builtin.file:
+    src: "{{ prezto_path }}/runcoms/{{ item }}"
+    dest: "/root/.{{ item }}"
+    state: link
+    force: true
+  with_items: "{{ zsh_files.stdout_lines }}"
+
+- name: Set Zsh as default shell
+  ansible.builtin.user:
+    name: root
+    shell: /bin/zsh

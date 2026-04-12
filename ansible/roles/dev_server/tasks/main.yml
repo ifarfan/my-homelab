@@ -11,5 +11,11 @@
 - name: Configure Github CLI
   ansible.builtin.import_tasks: gh-cli.yml
 
+- name: Configure Prezto
+  ansible.builtin.import_tasks: prezto.yml
+
+- name: Configure dotfiles
+  ansible.builtin.import_tasks: dotfiles.yml
+
 - name: Other miscellaneous tasks
   ansible.builtin.import_tasks: miscellaneous.yml

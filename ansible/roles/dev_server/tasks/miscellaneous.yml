@@ -14,18 +14,8 @@
     group: root
     state: link
 
-- name: Copy git config
-  ansible.builtin.template:
-    src: gitconfig.j2
-    dest: /root/.gitconfig
-    owner: root
-    group: root
-    mode: 0644
-
-- name: Copy global git ignore
-  ansible.builtin.copy:
-    src: gitignore_global
-    dest: /root/.gitignore_global
-    owner: root
-    group: root
-    mode: 0644
+- name: Install Miscellaneous packages
+  ansible.builtin.apt:
+    pkg: "{{ item }}"
+    state: present
+  with_items: "{{ miscellaneous_pkgs }}"
