@@ -20,8 +20,7 @@
         src: "{{ item }}"
         dest: "{{ goss_folder }}/{{ item | basename }}"
         mode: 0755
-      with_items:
-        - "{{ goss_files }}"
+      loop: "{{ goss_files }}"
 
     - name: List goss files
       ansible.builtin.debug:
@@ -32,7 +31,7 @@
       ansible.builtin.command:
         goss --gossfile {{ goss_folder }}/{{ item | basename }} validate --format documentation
       register: test_results
-      with_items: "{{ goss_files }}"
+      loop: "{{ goss_files }}"
       failed_when: false
       changed_when: false
 

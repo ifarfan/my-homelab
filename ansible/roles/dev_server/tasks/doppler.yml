@@ -3,7 +3,7 @@
   ansible.builtin.apt:
     pkg: "{{ item }}"
     state: present
-  with_items: "{{ doppler_req_pkgs }}"
+  loop: "{{ doppler_req_pkgs }}"
 
 - name: Download repository GPG key
   ansible.builtin.get_url:

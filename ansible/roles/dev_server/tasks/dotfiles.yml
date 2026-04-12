@@ -36,7 +36,7 @@
     dest: "/root/.{{ item }}"
     state: link
     force: true
-  with_items: "{{ source_dotfiles.stdout_lines }}"
+  loop: "{{ source_dotfiles.stdout_lines }}"
 
 - name: Copy git config
   ansible.builtin.template:
