@@ -43,8 +43,8 @@ type grc >/dev/null && unalias grc
 alias cp='cp -iv'                                   # Preferred 'cp' implementation
 alias mv='mv -iv'                                   # Preferred 'mv' implementation
 alias mkdir='mkdir -pv'                             # Preferred 'mkdir' implementation
-alias ll='lsd -lA'                                  # Preferred 'ls' implementation
-alias xx='exa --long --header --grid --icons --all --color-scale --group-directories-first --group'            # My exa view
+alias ll='lsd --almost-all --long --date relative --group-directories-first --classify'                 # Preferred 'ls' implementation
+alias xx='exa --long --header --grid --icons --all --color-scale --group-directories-first --group'     # My exa view
 alias less='less -FSRXc'                            # Preferred 'less' implementation
 alias cd..='cd ../'                                 # Go back 1 directory level (for fast typers)
 alias ..='cd ../'                                   # Go back 1 directory level
