@@ -67,6 +67,8 @@ alias my_ip="dig +short myip.opendns.com @resolver1.opendns.com"
 alias pgcli="PAGER='grcat ~/.grcat | less -iMSx4FXRe' pgcli"
 
 # New ones!
+alias b='batcat'
+alias bat='batcat'
 alias tf='terraform'
 alias kubectl='kubecolor'
 alias k='kubectl'
