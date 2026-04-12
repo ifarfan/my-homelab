@@ -49,10 +49,26 @@
     group: root
     mode: 0600
 
-- name: Copy "starship" config
+- name: List of starship theme files          # noqa: command-instead-of-module
+  ansible.builtin.shell:
+    cmd: ls -1 starship*.toml
+    executable: /bin/bash
+    chdir: "{{ role_path }}/files/"
+  changed_when: false
+  register: starship_files
+
+- name: Copy starship theme files
   ansible.builtin.copy:
-    src: starship.pastel-powerline.toml
-    dest: /root/.config/starship.toml
+    src: "{{ item }}"
+    dest: "{{ starship_path }}/{{ item }}"
     owner: root
     group: root
     mode: 0644
+  loop: "{{ starship_files.stdout_lines }}"
+
+- name: Link main starship theme
+  ansible.builtin.file:
+    src: "{{ starship_path }}/starship.pastel-powerline.toml"
+    dest: "{{ starship_path }}/starship.toml"
+    state: link
+    force: true

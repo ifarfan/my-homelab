@@ -151,3 +151,5 @@ shell_integrations:
   - 'eval "$(atuin init bash)"'                                   # Shell history
   - ''
   - 'eval "$(starship init bash)"'                                # Starship prompt
+
+starship_path: /root/.config/
