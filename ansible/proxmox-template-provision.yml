@@ -1,0 +1,54 @@
+---
+- name: Set dynamic hostname
+  ansible.builtin.import_playbook: proxmox-get-hostname.yml
+  vars:
+    my_host: template
+
+- name: Template provisioning
+  hosts: "{{ hostvars['localhost']['my_fqdn_host'] }}"
+  remote_user: ubuntu
+  become: true
+  gather_facts: true
+  tasks:
+    # ? Base OS install + fixings
+    - name: Install Ubuntu base
+      ansible.builtin.include_role:
+        name: base_24
+      vars:
+        has_swap: true
+
+    - name: Install modern Unix utilities
+      ansible.builtin.include_role:
+        name: modern_unix
+
+    # ? Post-provisioning operations
+    - name: Run Goss tests for Ubuntu 24.04
+      ansible.builtin.include_role:
+        name: run_tests
+      vars:
+        role_to_test: base_24
+
+    - name: Run Goss tests for modern unix utilities
+      ansible.builtin.include_role:
+        name: run_tests
+      vars:
+        role_to_test: modern_unix
+
+    # ? Clean-up and reset VM template
+    - name: Truncate files
+      ansible.builtin.command: |
+        truncate -s 0 /etc/machine-id
+        truncate -s 0 /etc/machine-info
+        truncate -s 0 /var/log/*log
+
+    - name: Remove files + directories
+      ansible.builtin.command: |
+        rm -f /etc/ssh/ssh_host_*
+        rm -f /etc/udev/rules.d/70-persistent-net.rules
+        rm -f /usr/local/bin/goss
+        rm -f /var/lib/cloud/instance
+        rm -rf /var/lib/cloud/data/
+        rm -rf /var/lib/cloud/instances/
+        rm -f /var/lib/dbus/machine-id
+        rm -rf /tmp/*
+        rm -rf /var/tmp/*

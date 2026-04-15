@@ -51,9 +51,11 @@
 
 - name: List of starship theme files          # noqa: command-instead-of-module
   ansible.builtin.shell:
-    cmd: ls -1 starship*.toml
+    cmd: ls -1 starship.*.toml
     executable: /bin/bash
-    chdir: "{{ role_path }}/files/"
+    chdir: "{{ role_path }}/files"
+  delegate_to: localhost
+  become: false
   changed_when: false
   register: starship_files
 
