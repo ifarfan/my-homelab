@@ -50,7 +50,7 @@ tasks:
       - sh: test -f {{.SERVICE_TF_STATE}}
         msg: "{{.SERVICE_TF_STATE}} not found"
     cmds:
-      - terraform destroy -lock=false -compact-warnings -var-file={{.TERRAFORM_SECRETS}} -auto-approve
+      - terraform destroy -lock=false -compact-warnings -var-file={{.TERRAFORM_SECRETS}}
 
   destroy-lxc:
     internal: true
