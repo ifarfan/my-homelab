@@ -1,7 +1,7 @@
 locals {
-  hostname        = "${var.hostname}.${var.cloudflare_domain}"
-  tags            = var.tags == "" ? ["terraform"] : split(",", "${var.tags},terraform")
-  description     = <<-EOT
+  hostname         = "${var.hostname}.${var.cloudflare_domain}"
+  tags             = var.tags == "" ? ["terraform"] : split(",", "${var.tags},terraform")
+  description      = <<-EOT
     # ${var.description}
 
     |            |                                      |
