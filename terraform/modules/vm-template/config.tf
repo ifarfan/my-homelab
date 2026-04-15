@@ -1,7 +1,3 @@
-terraform {
-  backend "local" {}
-}
-
 provider "proxmox" {
   endpoint = var.proxmox_url
   username = var.proxmox_user
