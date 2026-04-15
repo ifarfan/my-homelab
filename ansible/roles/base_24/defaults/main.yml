@@ -32,7 +32,6 @@ apt_pkgs_to_remove:
   - python3-debconf
   - python3-debian
   - run-one
-  - sbsigntool
   - secureboot-db
   - tcl
   - telnet

@@ -19,7 +19,7 @@ tasks:
       - 'echo ANSIBLE_PLAYBOOK={{.SERVICE_ANSIBLE_PLAYBOOK}}'
 
   # Terraform operations
-  create:
+  terraform-create:
     internal: true
     dir: "/{{.SERVICE_TF_DIR}}"
     preconditions:
@@ -28,9 +28,7 @@ tasks:
     cmds:
       - terraform init -backend-config="path={{.SERVICE_TF_STATE}}"
       - terraform fmt && terraform validate
-      - terraform apply \
-          -lock=false   \
-          -var-file={{.TERRAFORM_SECRETS}}
+      - terraform apply -lock=false -var-file={{.TERRAFORM_SECRETS}}
       - terraform output
 
   create-lxc:
@@ -42,22 +40,20 @@ tasks:
     cmds:
       - terraform init -backend-config="path={{.SERVICE_TF_STATE}}"
       - terraform fmt && terraform validate
-      - terraform apply \
+      - |
+        terraform apply \
           -lock=false   \
           -var-file={{.TERRAFORM_SECRETS}}
       - terraform output
 
-  destroy:
+  terraform-destroy:
     internal: true
     dir: "/{{.SERVICE_TF_DIR}}"
     preconditions:
       - sh: test -f {{.SERVICE_TF_STATE}}
         msg: "{{.SERVICE_TF_STATE}} not found"
     cmds:
-      - terraform destroy   \
-          -lock=false       \
-          -compact-warnings \
-          -var-file={{.TERRAFORM_SECRETS}}
+      - terraform destroy -lock=false -compact-warnings -var-file={{.TERRAFORM_SECRETS}}
 
   destroy-lxc:
     internal: true
@@ -66,7 +62,8 @@ tasks:
       - sh: test -f {{.SERVICE_TF_STATE}}
         msg: "{{.SERVICE_TF_STATE}} not found"
     cmds:
-      - terraform destroy   \
+      - |
+        terraform destroy   \
           -lock=false       \
           -compact-warnings \
           -var-file={{.TERRAFORM_SECRETS}}
