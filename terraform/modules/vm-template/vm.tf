@@ -1,23 +1,25 @@
 resource "proxmox_virtual_environment_vm" "vm_template" {
-  name      = "${local.name}.${var.cloudflare_domain}"
-  node_name = local.node
+  name        = "${var.hostname}.${var.cloudflare_domain}"
+  node_name   = var.proxmox_node
+  description = local.description
+  tags        = local.tags
 
   agent {
     enabled = local.agent_enabled
   }
 
   cpu {
-    cores = local.cpu_cores
+    cores = var.cores
   }
 
   memory {
-    dedicated = local.memory_dedicated
+    dedicated = var.memory
   }
 
   initialization {
     ip_config {
       ipv4 {
-        address = "${local.network.ip}/24"
+        address = "${var.ip}/24"
         gateway = local.network.gw
       }
     }
@@ -42,7 +44,7 @@ resource "proxmox_virtual_environment_vm" "vm_template" {
 resource "proxmox_virtual_environment_file" "userdata_cloudconfig" {
   content_type = "snippets"
   datastore_id = local.nfs_datastore_id
-  node_name    = local.node
+  node_name    = var.proxmox_node
 
   source_raw {
     data      = local.user_data

@@ -1,10 +1,18 @@
 locals {
-  name = "template"
-  node = "m3"
+  hostname         = "${var.hostname}.${var.cloudflare_domain}"
+  tags             = var.tags == "" ? ["terraform"] : split(",", "${var.tags},terraform")
+  description      = <<-EOT
+    # ${var.description}
 
+    |            |                                      |
+    | ---------- |--------------------------------------|
+    | hostname   | `${var.hostname}`                    |
+    | ip         | `${var.ip}`                          |
+    | cores      | `${var.cores}`                       |
+    | memory     | `${var.memory} GB`                   |
+    | root disk  | `${var.disk_size}`                   |
+  EOT
   agent_enabled    = true
-  cpu_cores        = 2
-  memory_dedicated = 2048
   nfs_datastore_id = "ds1-nfs"
 
   user = {
@@ -18,20 +26,19 @@ locals {
     interface    = "virtio0"
     iothread     = true
     discard      = "on"
-    size         = 20
+    size         = var.disk_size
   }
 
   network = {
-    ip     = "192.168.136.100"
     gw     = "192.168.136.1"
     bridge = "vmbr0"
   }
 
-  user_file = "userdata-cloudconfig-${local.name}.yaml"
+  user_file = "userdata-cloudconfig-${var.hostname}.yaml"
   user_data = <<-EOF
     #cloud-config
     disable_root: false
-    hostname: ${local.name}
+    hostname: ${var.hostname}
     keyboard:
       layout: us
     locale: en_US.UTF-8

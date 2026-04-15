@@ -28,7 +28,7 @@ tasks:
     cmds:
       - terraform init -backend-config="path={{.SERVICE_TF_STATE}}"
       - terraform fmt && terraform validate
-      - terraform apply -lock=false -var-file={{.TERRAFORM_SECRETS}}
+      - terraform apply -lock=false -var-file={{.TERRAFORM_SECRETS}} -compact-warnings
       - terraform output
 
   create-lxc:
@@ -40,10 +40,7 @@ tasks:
     cmds:
       - terraform init -backend-config="path={{.SERVICE_TF_STATE}}"
       - terraform fmt && terraform validate
-      - |
-        terraform apply \
-          -lock=false   \
-          -var-file={{.TERRAFORM_SECRETS}}
+      - terraform apply -lock=false -var-file={{.TERRAFORM_SECRETS}}
       - terraform output
 
   terraform-destroy:
@@ -62,11 +59,7 @@ tasks:
       - sh: test -f {{.SERVICE_TF_STATE}}
         msg: "{{.SERVICE_TF_STATE}} not found"
     cmds:
-      - |
-        terraform destroy   \
-          -lock=false       \
-          -compact-warnings \
-          -var-file={{.TERRAFORM_SECRETS}}
+      - terraform destroy -lock=false -compact-warnings -var-file={{.TERRAFORM_SECRETS}}
 
   update-dns:
     internal: true
