@@ -31,9 +31,9 @@ tasks:
       - |
         terraform apply \
             -lock=false \
+            -compact-warnings \
             {{.MY_TF_VARS | default ""}} \
-            -var-file={{.TERRAFORM_SECRETS}} \
-            -compact-warnings
+            -var-file={{.TERRAFORM_SECRETS}}
       - terraform output
 
   create-lxc:

@@ -57,8 +57,6 @@ tasks:
     cmds:
       # First create VM
       - task: shared:terraform-create
-        vars:
-          MY_TF_VARS: -var="convert_to_template=false"
       - sleep 10
       # Provision VM
       - task: ansible-proxmox
@@ -74,5 +72,3 @@ tasks:
     desc: Destroy VM Template
     cmds:
       - task: shared:terraform-destroy
-        # vars:
-        #   MY_TF_VARS: -var="convert_to_template=false"
