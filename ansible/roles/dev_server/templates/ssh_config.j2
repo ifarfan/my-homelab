@@ -1,0 +1,38 @@
+Host *
+    ControlMaster auto
+    ControlPath ~/.ssh/control-%r@%h:%p
+    ControlPersist 5m
+    IdentitiesOnly yes
+    PubkeyAuthentication yes
+    StrictHostKeyChecking no
+    UserKnownHostsFile=/dev/null
+    IdentityFile ~/.ssh/id_ed25519
+
+#  Proxmox
+Host m?
+  User root
+
+#  VM template
+Host template.{{ global_domain}}
+    User ubuntu
+
+#  Oracle Cloud
+Host cloudy-box.{{ global_domain}}
+    User ubuntu
+
+# Local mac
+Host mymini.{{ global_domain}}
+    User ifarfan
+
+#  Raspberry Pis:
+#    - On 1st boot user is 'izzy'
+#    - change to "root" after provisioning
+Host rpi?.local
+  User izzy
+
+Host rpi?.{{ global_domain }}
+  User root
+
+# Everything else
+Host *.{{ global_domain }}
+    User root
