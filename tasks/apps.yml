@@ -14,18 +14,18 @@ tasks:
   check:
     desc: 'Check "{{.APPS_HOST}}" host vars'
     cmds:
-      - task: shared:check-lxc-vars
+      - task: shared:check-vars
 
   # ? Terraform
   create-lxc:
     desc: 'Create "{{.APPS_HOST}}" host'
     cmds:
-      - task: shared:create-lxc
+      - task: shared:terraform-create
 
   destroy-lxc:
     desc: 'Destroy "{{.APPS_HOST}}" host'
     cmds:
-      - task: shared:destroy-lxc
+      - task: shared:terraform-destroy
 
   update-dns:
     desc: 'Update DNS records for "{{.APPS_HOST}}" host'
