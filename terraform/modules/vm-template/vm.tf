@@ -1,10 +1,10 @@
 resource "proxmox_virtual_environment_vm" "vm_template" {
-  name            = local.name
-  node_name       = var.proxmox_node
-  description     = local.description
-  migrate         = true
-  tags            = local.tags
-  template        = local.template
+  name        = local.name
+  node_name   = var.proxmox_node
+  description = local.description
+  migrate     = true
+  tags        = local.tags
+  template    = local.template
 
   agent {
     enabled = local.agent_enabled

@@ -18,7 +18,7 @@ locals {
 
     ![Ubuntu](https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/ubuntu.svg)
   EOT
-  tags = var.tags == "" ? ["terraform"] : split(",", "${var.tags},terraform")
+  tags        = var.tags == "" ? ["terraform"] : split(",", "${var.tags},terraform")
 
   agent_enabled    = true
   nfs_datastore_id = "ds1-nfs"
