@@ -10,7 +10,7 @@ vars:
   SERVICE_ANSIBLE_PLAYBOOK: "lxc-{{.SERVICE_VAR}}-provision.yml"
 
 tasks:
-  check-lxc-vars:
+  check-vars:
     internal: true
     cmds:
       - 'echo HOST={{.SERVICE_VAR}}.{{.GLOBAL_DOMAIN}}'
@@ -36,18 +36,6 @@ tasks:
             -var-file={{.TERRAFORM_SECRETS}}
       - terraform output
 
-  create-lxc:
-    internal: true
-    dir: "/{{.SERVICE_TF_DIR}}"
-    preconditions:
-      - sh: test -f {{.SERVICE_TF_STATE}}
-        msg: "{{.SERVICE_TF_STATE}} not found"
-    cmds:
-      - terraform init -backend-config="path={{.SERVICE_TF_STATE}}"
-      - terraform fmt && terraform validate
-      - terraform apply -lock=false -var-file={{.TERRAFORM_SECRETS}}
-      - terraform output
-
   terraform-destroy:
     internal: true
     dir: "/{{.SERVICE_TF_DIR}}"
@@ -61,15 +49,6 @@ tasks:
             -compact-warnings \
             {{.MY_TF_VARS | default ""}} \
             -var-file={{.TERRAFORM_SECRETS}}
-
-  destroy-lxc:
-    internal: true
-    dir: "/{{.SERVICE_TF_DIR}}"
-    preconditions:
-      - sh: test -f {{.SERVICE_TF_STATE}}
-        msg: "{{.SERVICE_TF_STATE}} not found"
-    cmds:
-      - terraform destroy -lock=false -compact-warnings -var-file={{.TERRAFORM_SECRETS}}
 
   update-dns:
     internal: true

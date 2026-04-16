@@ -14,20 +14,20 @@ tasks:
   check:
     desc: 'Check "{{.GRAFIX_HOST}}" host vars'
     cmds:
-      - task: shared:check-lxc-vars
+      - task: shared:check-vars
 
   # ? Terraform
   create-lxc:
     desc: "Create '{{.GRAFIX_HOST}}' host + patch LXC"
     cmds:
-      - task: shared:create-lxc
+      - task: shared:terraform-create
       - task: shared:patch-lxc
         vars: {PATCH_NAME: 'gnu'}
 
   destroy-lxc:
     desc: 'Destroy "{{.GRAFIX_HOST}}" host'
     cmds:
-      - task: shared:destroy-lxc
+      - task: shared:terraform-destroy
 
   update-dns:
     desc: 'Update DNS records for "{{.GRAFIX_HOST}}" host'

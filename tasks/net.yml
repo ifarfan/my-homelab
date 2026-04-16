@@ -14,20 +14,20 @@ tasks:
   check:
     desc: 'Check "{{.NET_HOST}}" host vars'
     cmds:
-      - task: shared:check-lxc-vars
+      - task: shared:check-vars
 
   # ? Terraform
   create-lxc:
     desc: 'Create "{{.NET_HOST}}" host + patch LXC'
     cmds:
-      - task: shared:create-lxc
+      - task: shared:terraform-create
       - task: shared:patch-lxc
         vars: {PATCH_NAME: 'devtun'}
 
   destroy-lxc:
     desc: 'Destroy "{{.NET_HOST}}" host'
     cmds:
-      - task: shared:destroy-lxc
+      - task: shared:terraform-destroy
 
   update-dns:
     desc: 'Update DNS records for "{{.NET_HOST}}" host'
