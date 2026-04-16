@@ -55,13 +55,24 @@ tasks:
   create-vm-template:
     desc: Provision VM Template
     cmds:
+      # First create VM
       - task: shared:terraform-create
+        vars:
+          MY_TF_VARS: -var="convert_to_template=false"
       - sleep 10
+      # Provision VM
       - task: ansible-proxmox
         vars:
           P_PLAYBOOK: 'proxmox-template-provision.yml'
+      - sleep 10
+      # Convert VM to a template
+      - task: shared:terraform-create
+        vars:
+          MY_TF_VARS: -var="convert_to_template=true"
 
   destroy-vm-template:
     desc: Destroy VM Template
     cmds:
       - task: shared:terraform-destroy
+        # vars:
+        #   MY_TF_VARS: -var="convert_to_template=false"

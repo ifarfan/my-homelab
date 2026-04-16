@@ -22,6 +22,9 @@ module "my_vm_template" {
   disk_size    = 20
   proxmox_node = "m3"
   tags         = "template,ubuntu"
+
+  # Whether to convert the VM to a template after creation
+  convert_to_template = var.convert_to_template
 }
 
 output "my_vm_template" {

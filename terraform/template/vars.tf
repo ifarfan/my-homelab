@@ -24,3 +24,8 @@ variable "cloudflare_domain" {
 variable "github_username" {
   type = string
 }
+
+variable "convert_to_template" {
+  type    = bool
+  default = false
+}
