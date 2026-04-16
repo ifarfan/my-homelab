@@ -21,7 +21,12 @@
       ansible.builtin.include_role:
         name: modern_unix
 
-    # ? Post-provisioning operations
+- name: Run post-provisioning tests
+  hosts: "{{ hostvars['localhost']['my_fqdn_host'] }}"
+  remote_user: ubuntu
+  become: true
+  gather_facts: true
+  tasks:
     - name: Run Goss tests for Ubuntu 24.04
       ansible.builtin.include_role:
         name: run_tests
@@ -52,3 +57,7 @@
         rm -f /var/lib/dbus/machine-id
         rm -rf /tmp/*
         rm -rf /var/tmp/*
+
+    - name: Shut down prior to converting to template
+      community.general.shutdown:
+        msg: "Shutting down after provisioning"

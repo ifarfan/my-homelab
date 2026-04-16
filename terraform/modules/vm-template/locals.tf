@@ -1,7 +1,10 @@
 locals {
-  hostname         = "${var.hostname}.${var.cloudflare_domain}"
-  tags             = var.tags == "" ? ["terraform"] : split(",", "${var.tags},terraform")
-  description      = <<-EOT
+  # Determine if converting to template or creating a VM
+  name     = var.convert_to_template == true ? "template-ubuntu-24-04" : "${var.hostname}.${var.cloudflare_domain}"
+  template = var.convert_to_template == true ? true : false
+
+  # Other settings
+  description = <<-EOT
     # ${var.description}
 
     |            |                                      |
@@ -10,8 +13,13 @@ locals {
     | ip         | `${var.ip}`                          |
     | cores      | `${var.cores}`                       |
     | memory     | `${var.memory} GB`                   |
-    | root disk  | `${var.disk_size}`                   |
+    | root disk  | `${var.disk_size} GB`                |
+    | template   | `${var.convert_to_template}`         |
+
+    ![Ubuntu](https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/ubuntu.svg)
   EOT
+  tags        = var.tags == "" ? ["terraform"] : split(",", "${var.tags},terraform")
+
   agent_enabled    = true
   nfs_datastore_id = "ds1-nfs"
 

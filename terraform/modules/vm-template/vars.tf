@@ -63,3 +63,8 @@ variable "proxmox_node" {
   type    = string
   default = "m0"
 }
+
+variable "convert_to_template" {
+  type    = bool
+  default = false
+}
