@@ -1,0 +1,39 @@
+---
+version: '3'
+
+includes:
+  shared:
+    taskfile: ./__shared.yml
+    internal: true
+
+vars:
+  UBU24_HOST: "ubuntu24"
+  SERVICE_VAR: "{{.UBU24_HOST}}"
+
+tasks:
+  ansible-template:
+    internal: true
+    dir: "/{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook -i {{.ANSIBLE_INVENTORY_PROXMOX}} {{.UBU24_HOST}}-provision.yml
+
+  create-template:
+    desc: Provision Ubuntu 24.04 VM Template
+    vars:
+      WAIT_SECS: 5
+    cmds:
+      # First create VM
+      - task: shared:terraform-create
+      - sleep {{.WAIT_SECS}}
+      # Provision VM
+      - task: ansible-template
+      - sleep {{.WAIT_SECS}}
+      # Convert VM to a template
+      - task: shared:terraform-create
+        vars:
+          MY_TF_VARS: -var="convert_to_template=true"
+
+  destroy-template:
+    desc: Destroy Ubuntu 24.04 VM Template
+    cmds:
+      - task: shared:terraform-destroy

@@ -14,7 +14,7 @@ module "my_vm_template" {
   github_username      = var.github_username
 
   # ? VM Settings
-  hostname     = "template"
+  # hostname     = "template"
   description  = "VM Template for Ubuntu 24.04"
   cores        = 2
   ip           = "192.168.136.100"
@@ -22,6 +22,9 @@ module "my_vm_template" {
   disk_size    = 20
   proxmox_node = "m3"
   tags         = "template,ubuntu"
+
+  # OS version
+  template_os = "ubuntu24"
 
   # Whether to convert the VM to a template after creation
   convert_to_template = var.convert_to_template

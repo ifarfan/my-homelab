@@ -10,7 +10,7 @@ output "vm_proxmox_node" {
 
 output "vm_hostname" {
   description = "VM Hostname"
-  value       = "${var.hostname}.${var.cloudflare_domain}"
+  value       = "${var.template_os}.${var.cloudflare_domain}"
 }
 
 output "vm_ip" {
