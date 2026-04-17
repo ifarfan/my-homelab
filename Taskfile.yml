@@ -6,16 +6,18 @@ version: '3'
 dotenv: ['.env']
 
 includes:
-  apps: ./tasks/apps.yml
-  arrs: ./tasks/arrs.yml
-  debug: ./tasks/debug.yml
-  devbox: ./tasks/devbox.yml
-  grafix: ./tasks/grafix.yml
-  net: ./tasks/net.yml
-  oracle: ./tasks/oracle.yml
-  proxmox: ./tasks/proxmox.yml
-  rpi: ./tasks/rpi.yml
-  tools: ./tasks/tools.yml
+  apps: tasks/apps.yml
+  arrs: tasks/arrs.yml
+  debug: tasks/debug.yml
+  devbox: tasks/devbox.yml
+  grafix: tasks/grafix.yml
+  net: tasks/net.yml
+  oracle: tasks/oracle.yml
+  proxmox: tasks/proxmox.yml
+  rpi: tasks/rpi.yml
+  tools: tasks/tools.yml
+  ubuntu24: tasks/ubuntu24.yml
+  ubuntu26: tasks/ubuntu26.yml
 
 vars:
   HOME_DIR:
@@ -27,3 +29,8 @@ vars:
   TERRAFORM_DIR: "{{.HOME_DIR}}/terraform"
   TERRAFORM_SECRETS: "{{.HOME_DIR}}/terraform/secrets.auto.tfvars"
   TERRAFORM_STATE: $MY_TERRAFORM_STATE
+
+tasks:
+  default:
+    cmds:
+      - task --list

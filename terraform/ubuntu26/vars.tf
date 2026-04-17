@@ -25,44 +25,6 @@ variable "github_username" {
   type = string
 }
 
-# VM-specific variables
-variable "description" {
-  type = string
-}
-
-variable "cores" {
-  type    = number
-  default = 2
-}
-
-variable "memory" {
-  type    = number
-  default = 2048
-}
-
-variable "tags" {
-  type    = string
-  default = ""
-}
-
-variable "ip" {
-  type = string
-}
-
-variable "disk_size" {
-  type    = string
-  default = "20"
-}
-
-variable "proxmox_node" {
-  type    = string
-  default = "m0"
-}
-
-variable "template_os" {
-  type = string
-}
-
 variable "convert_to_template" {
   type    = bool
   default = false

@@ -1,6 +1,6 @@
 locals {
   # Determine if converting to template or creating a VM
-  name     = var.convert_to_template == true ? "template-ubuntu-24-04" : "${var.hostname}.${var.cloudflare_domain}"
+  name     = var.convert_to_template == true ? "template-${var.template_os}" : "${var.template_os}.${var.cloudflare_domain}"
   template = var.convert_to_template == true ? true : false
 
   # Other settings
@@ -9,7 +9,7 @@ locals {
 
     |            |                                      |
     | ---------- |--------------------------------------|
-    | hostname   | `${var.hostname}`                    |
+    | hostname   | `${var.template_os}`                 |
     | ip         | `${var.ip}`                          |
     | cores      | `${var.cores}`                       |
     | memory     | `${var.memory} GB`                   |
@@ -23,6 +23,13 @@ locals {
   agent_enabled    = true
   nfs_datastore_id = "ds1-nfs"
 
+  # Determine OS image file
+  iso_os = {
+    ubuntu24 = "${local.nfs_datastore_id}:iso/ubuntu-24.04-minimal-cloudimg-amd64.img"
+    ubuntu26 = "${local.nfs_datastore_id}:iso/ubuntu-26.04-minimal-cloudimg-amd64.img"
+  }
+  os_image_file = local.iso_os[var.template_os]
+
   user = {
     name = "ubuntu"
     keys = data.github_user.my_username.ssh_keys
@@ -30,7 +37,7 @@ locals {
 
   disk = {
     datastore_id = "local-lvm"
-    file_id      = "${local.nfs_datastore_id}:iso/ubuntu-24.04-minimal-cloudimg-amd64.img"
+    file_id      = local.os_image_file
     interface    = "virtio0"
     iothread     = true
     discard      = "on"
@@ -42,11 +49,11 @@ locals {
     bridge = "vmbr0"
   }
 
-  user_file = "userdata-cloudconfig-${var.hostname}.yaml"
+  user_file = "userdata-cloudconfig-${var.template_os}.yaml"
   user_data = <<-EOF
     #cloud-config
     disable_root: false
-    hostname: ${var.hostname}
+    hostname: ${var.template_os}
     keyboard:
       layout: us
     locale: en_US.UTF-8
